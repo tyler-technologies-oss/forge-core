@@ -3,10 +3,10 @@ name: Build and Release
 on:
   push:
     branches:
-      - master
+      - dev
   pull_request:
     branches:
-      - master
+      - dev
   workflow_dispatch:
     
 concurrency: auto-release-${{ github.ref	}}
@@ -19,7 +19,7 @@ jobs:
       - name: Package Repo Selection
         id: pkg-repo
         run: |
-          if [ "${GITHUB_REF}" == 'refs/heads/master' ]; then
+          if [ "${GITHUB_REF}" == 'refs/heads/dev' ]; then
             echo "::set-output name=repo-name::FORGE"
           else
             echo "::set-output name=repo-name::SCRATCH"
@@ -32,7 +32,7 @@ jobs:
     needs: wf-config
     uses: tyler-technologies/forge-automation-shared/.github/workflows/wf-build-release.yml@v0.1.0
     with:
-      PRODUCTION_RELEASE: ${{ github.ref == 'refs/heads/master' && contains(fromJson('["push", "workflow_dispatch"]'), github.event_name) }}
+      PRODUCTION_RELEASE: ${{ github.ref == 'refs/heads/dev' && contains(fromJson('["push", "workflow_dispatch"]'), github.event_name) }}
       NODE_VERSION: "14"
     secrets:
       GITHUB_APP_ID: ${{ secrets.TCP_AUTOMATION_APP_ID }}
