@@ -58,6 +58,7 @@ export interface IDevtoolConfig {
 }
 
 const PACKAGE_NAME = packageJson.name;
+const OUTPUT_FILENAME = PACKAGE_NAME.includes('/') ? PACKAGE_NAME.split('/')[1] : PACKAGE_NAME;
 const PACKAGE_VERSION = packageJson.version;
 const ROLLUP_GLOBALS = {
   'tslib': 'tslib',
@@ -114,7 +115,7 @@ task('generate:bundles', async () => {
   const rollupConfigCjs: IBundleConfig = {
     name: PACKAGE_NAME,
     input: join(esm2015BuildRoot, 'index.js'),
-    file: join(DIST_ROOT, `dist/${PACKAGE_NAME}.cjs`),
+    file: join(DIST_ROOT, `dist/${OUTPUT_FILENAME}.cjs.js`),
     format: 'cjs',
     version: PACKAGE_VERSION,
     minify: false
@@ -125,7 +126,7 @@ task('generate:bundles', async () => {
   const rollupConfigESM: IBundleConfig = {
     name: PACKAGE_NAME,
     input: join(esm2015BuildRoot, 'index.js'),
-    file: join(DIST_ROOT, `dist/${PACKAGE_NAME}.mjs`),
+    file: join(DIST_ROOT, `dist/${OUTPUT_FILENAME}.js`),
     format: 'es',
     version: PACKAGE_VERSION,
     minify: false
