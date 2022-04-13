@@ -602,6 +602,31 @@ export function ensureChild(element: Element, selector: string): Promise<Element
 }
 
 /**
+ * Resolves a promise when the provided host element has an `<input>` element child
+ * @param {HTMLElement} host An element that does or will contain children.
+ */
+export function ensureInputElement(host: HTMLElement): Promise<Element>{
+  return new Promise<Element>(resolve => {
+    const element = host.querySelector('input');
+    if (element) {
+      resolve(element);
+    }
+
+    const observer = new MutationObserver(changes => {
+      const hasAddedNodes = changes.reduce((prev, curr) => prev + curr.addedNodes.length, 0) > 0;
+      if (hasAddedNodes) {
+        const foundElement = host.querySelector('input');
+        if (foundElement) {
+          observer.disconnect();
+          resolve(foundElement);
+        }
+      }
+    });
+    observer.observe(host, { childList: true, subtree: true });
+  });
+}
+
+/**
  * Walks up the tree starting a specific node and stops when the provided matcher function returns true.
  * @param {Node} node The node to start searching from.
  * @returns {Node | null} The closest matching ancestor node, or null if not found.
@@ -721,4 +746,134 @@ export function getActiveShadowElement(element: Element): Element {
     element = getActiveShadowElement(element.shadowRoot.activeElement);
   }
   return element;
+}
+
+/** Toggles a CSS class (or classes) on an element based on a boolean. */
+export function toggleClass(el: HTMLElement, hasClass: boolean, className: string | string[]): void {
+  if (hasClass) {
+    addClass(className, el);
+  } else {
+    removeClass(className, el);
+  }
+}
+
+/** Toggles a value-less attribute on an element. */
+export function toggleAttribute(el: HTMLElement, hasAttribute: boolean, name: string, value = ''): void {
+  if (hasAttribute) {
+    el.setAttribute(name, value);
+  } else {
+    el.removeAttribute(name);
+  }
+}
+
+/** Toggles part of an attribute on an element. */
+export function toggleOnAttribute(el: HTMLElement, attribute: string, value: string, force?: boolean): void {
+  const oldValue = el.getAttribute(attribute);
+  if ((force === undefined || force === true) && (!oldValue || !oldValue.includes(value))) {
+    appendToAttribute(el, attribute, value);
+  } else if (!force) {
+    removeFromAttribute(el, attribute, value);
+  }
+}
+
+/** Appends a value to an attribute on an element, first setting it if it doesn't exist. */
+export function appendToAttribute(el: HTMLElement, attribute: string, value: string): void {
+  const oldValue = el.getAttribute(attribute);
+  if (!oldValue || !oldValue.length) {
+    el.setAttribute(attribute, value);
+  } else {
+    el.setAttribute(attribute, `${oldValue} ${value}`);
+  }
+}
+
+/** Removes a value from an attribute on an element, removing the attribute if empty. */
+export function removeFromAttribute(el: HTMLElement, attribute: string, value: string): void {
+  if (!el.hasAttribute(attribute)) {
+    return;
+  }
+  const oldValue = el.getAttribute(attribute);
+  if (oldValue) {
+    let newValue = oldValue?.replace(value, '');
+    newValue = newValue.replace(/\s+/g, ' ').trim();
+    if (newValue.length) {
+      el.setAttribute(attribute, newValue);
+    } else {
+      el.removeAttribute(attribute);
+    }
+  }
+}
+
+/**
+ * Attempts to scroll a target element into view within a scrollable parent element, unless already visible within the container.
+ * @param scrollElement The scrollable parent element.
+ * @param targetElement The element to scroll into view.
+ * @param behavior The scroll behavior. Defaults to 'auto'.
+ * @param block The block position to anchor the target element to within the scroll element.
+ */
+export function tryScrollIntoView(scrollElement: HTMLElement, targetElement: HTMLElement, behavior: 'auto' | 'smooth' = 'auto', block: 'nearest' | 'center' = 'nearest'): void {
+  if (!scrollElement) {
+    return;
+  }
+
+  const canScroll = scrollElement.scrollHeight > scrollElement.clientHeight || scrollElement.scrollWidth > scrollElement.clientWidth;
+
+  if (canScroll) {
+    const offsetRect = offset(targetElement, scrollElement);
+    const isClippedTop = offsetRect.top <= targetElement.clientHeight;
+    const isClippedBottom = offsetRect.bottom <= targetElement.clientHeight;
+
+    if (isClippedTop || isClippedBottom) {
+      const top = calcBlockScroll(block, isClippedTop, targetElement.offsetTop, targetElement.clientHeight, scrollElement.offsetTop, scrollElement.offsetHeight);
+      scrollElement.scrollTo({ top, behavior });
+      return;
+    }
+    
+    const isClippedLeft = offsetRect.left <= targetElement.clientWidth;
+    const isClippedRight = offsetRect.right <= targetElement.clientWidth;
+
+    if (isClippedLeft || isClippedRight) {
+      const left = calcBlockScroll(block, isClippedLeft, targetElement.offsetLeft, targetElement.clientWidth, scrollElement.offsetLeft, scrollElement.offsetWidth);
+      scrollElement.scrollTo({ left, behavior });
+    }
+  }
+}
+
+/** Calculates the block anchor position for a target element within a scrollable parent element. */
+export function calcBlockScroll(block: 'nearest' | 'center', isClippedStart: boolean, targetOffset: number, targetSize: number, scrollOffset: number, scrollSize: number): number {
+  if (block === 'nearest') {
+    if (isClippedStart) {
+      return (targetOffset - scrollOffset) - targetSize;
+    }
+    return (targetOffset - scrollSize) + targetSize * 2;
+  }
+  return targetOffset - scrollOffset - scrollSize / 2 + targetSize / 2;
+}
+
+/**
+ * Creates an element from an HTML string.
+ */
+export function elementFromHTML(html: string): Element | null {
+  const template = document.createElement('template');
+  html = html.trim();
+  template.innerHTML = html;
+  return template.content.firstElementChild;
+}
+
+/**
+ * Observes changes to the provided attributes on a target element and executes a provided callback when changed.
+ * @param element The element to observe.
+ * @param listener The callback to execute when an attribute changes on the element.
+ * @param attributeFilter The attributes to observe.
+ * @returns A `MutationObserver` instasnce.
+ */
+export function createElementAttributeObserver(element: HTMLElement, listener: (name: string, value: string | null) => void, attributeFilter: string[] | undefined): MutationObserver {
+  const observer = new MutationObserver(mutations => {
+    for (const mutation of mutations) {
+      if (mutation.attributeName) {
+        listener(mutation.attributeName, element.getAttribute(mutation.attributeName));
+      }
+    }
+  });
+  observer.observe(element, { attributes: true, attributeFilter });
+  return observer;
 }

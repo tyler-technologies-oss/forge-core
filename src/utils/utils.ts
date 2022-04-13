@@ -1,4 +1,7 @@
-// https://stackoverflow.com/questions/899574/which-is-best-to-use-typeof-or-instanceof
+/** Generates random characters. Defaults to a length of 5. */
+export function randomChars(length = 5): string {
+  return Math.random().toString(36).substring(2, length);
+}
 
 /**
  * Checks if an object is undefined or null.
@@ -34,6 +37,15 @@ export function isBoolean(obj: any): obj is boolean {
  */
 export function isNumber(obj: any): obj is number {
   return typeof obj === 'number';
+}
+
+
+/** Determines if the provided string value can be parsed into a valid numeric value. */
+export function isNumeric(str: string): boolean {
+  if (typeof str !== 'string') {
+    return false;
+  }
+  return !isNaN(str as any) && !isNaN(parseFloat(str));
 }
 
 /**
@@ -101,6 +113,30 @@ export function coerceBoolean(value: string): boolean {
  */
 export function coerceNumber(value: string): number {
   return +value;
+}
+
+/** Coerces a string representation of an array of numbers, for example: `"[1,2,3]"`, to an array instance. */
+export function coerceNumberArray(strOrNumOrArray: string | Array<string | number>): number[] {
+  if (!strOrNumOrArray) {
+    return [];
+  }
+
+  if (typeof strOrNumOrArray === 'string') {
+    return strOrNumOrArray.replace(/ |\[|]|\"/g, '').split(',').map(n => Number(n));
+  } else if (typeof strOrNumOrArray === 'number') {
+    return [strOrNumOrArray];
+  } else {
+    return strOrNumOrArray.map(n => Number(n));
+  }
+}
+
+/**
+ * Compares two objects for deep equality.
+ * @param a 
+ * @param b 
+ */
+export function isDeepEqual(a: any, b: any): boolean {
+  return a === b || (typeof a === 'object' && typeof b === 'object' && JSON.stringify(a) === JSON.stringify(b));
 }
 
 /**
@@ -221,4 +257,33 @@ export function nameof(fn: () => any): string {
   }
 
   return match[1];
+}
+
+/*
+ * Watches for user events to detect if browser is idle.
+ * 
+ * @param callback The function to call when the browser becomes idle.
+ * @param timespan The time to wait before the browser is considered idle.
+ */
+export function idleWatch(callback: () => void, timespan: number): void {
+  const events = [
+    'mousedown',
+    'mousemove',
+    'touchstart',
+    'touchmove',
+    'keydown',
+    'wheel',
+    'resize'
+  ];
+
+  events.forEach(e => {
+    window.addEventListener(e, throttle((event: Event) => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      timeoutId = window.setTimeout(callback, timespan);
+    }, 1000, true), true);
+  });
+
+  let timeoutId = window.setTimeout(callback, timespan);
 }

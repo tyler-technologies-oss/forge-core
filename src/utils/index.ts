@@ -1,3 +1,4 @@
+export * from './a11y';
 export * from './clipboard';
 export * from './dom-utils';
 export * from './event-utils';
