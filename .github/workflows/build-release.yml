@@ -1,0 +1,128 @@
+## We only run this workflow on pushes to the master branch. This workflow will
+## first determine if a release is to be published, and if so, build and publish.
+## Otherwise, if not a release, we just perform CI build validation and deploy our
+## storybook build to GH Pages.
+
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/**/*'
+      - '.eslintrc.json'
+      - 'gulpfile.js'
+      - 'tsconfig.json'
+      - 'spec/**/*'
+      - 'src/**/*'
+
+concurrency: build-release-${{ github.ref }}
+
+jobs:
+  ## Gather configuration required by other jobs
+  wf-config:
+    name: Workflow Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Prepare Repository
+        # Fetch full git history and tags
+        run: git fetch --unshallow --tags
+
+      - name: Cache Dependencies
+        id: cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        env:
+          ARTIFACTORY_TOKEN: "${{ secrets.FORGE_ARTIFACTORY_TOKEN }}"
+          ARTIFACTORY_USERNAME: "${{ secrets.FORGE_ARTIFACTORY_USERNAME }}"
+        with:
+          node-version: "14"
+
+      - name: Install
+        id: install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.FORGE_ARTIFACTORY_TOKEN }}
+          ARTIFACTORY_TOKEN: "${{ secrets.FORGE_ARTIFACTORY_TOKEN }}"
+          ARTIFACTORY_USERNAME: "${{ secrets.FORGE_ARTIFACTORY_USERNAME }}"
+        run: npm ci
+
+      ## Determine if this is a release build or not, which will affect which dependent jobs run below
+      - name: Detect Release Status
+        id: detect-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.FORGE_ARTIFACTORY_TOKEN }}
+          ARTIFACTORY_TOKEN: "${{ secrets.FORGE_ARTIFACTORY_TOKEN }}"
+          ARTIFACTORY_USERNAME: "${{ secrets.FORGE_ARTIFACTORY_USERNAME }}"
+        run: |
+          ## We use `auto version` to calculate whether this is a release build or not
+          VERSION_RESULT=$(npx auto version)
+          if [[ "${VERSION_RESULT}" =~ ^(major|minor|patch|release)$ ]]; then
+            echo "::set-output name=release::true"
+          else
+            echo "::set-output name=release::false"
+          fi
+
+      ## Detect if any specific files we care about have changed to help us know if we need to execute a CI build or Storybook deployment at all or not
+      - name: Check File Changes
+        uses: dorny/paths-filter@v2
+        id: file-filter
+        with:
+          filters: |
+            build:
+              - '.github/workflows/**'
+              - '.eslintrc.json'
+              - 'gulpfile.js'
+              - 'tsconfig.json'
+              - 'src/**'
+            test:
+              - 'src/**'
+              - 'spec/**'
+    outputs:
+      is-release: ${{ steps.detect-release.outputs.release }}
+      build-files-changed: ${{ steps.file-filter.outputs.build == 'true' }}
+      test-files-changed: ${{ steps.file-filter.outputs.test == 'true' }}
+
+  # This job will run on non-release builds for general CI validation only if files are changed that need to be built
+  build:
+    name: Build and Test
+    needs: wf-config
+    uses: tyler-technologies/forge-automation-shared/.github/workflows/wf-build-and-test.yml@v0.10.0
+    if: ${{ needs.wf-config.outputs.is-release == 'false' && (needs.wf-config.outputs.build-files-changed == 'true' || needs.wf-config.outputs.test-files-changed == 'true') }}
+    with:
+      BUILD_ENABLED: ${{ needs.wf-config.outputs.build-files-changed == 'true' }}
+      TESTS_ENABLED: ${{ needs.wf-config.outputs.test-files-changed == 'true' }}
+    secrets:
+      ARTIFACTORY_TOKEN: ${{ secrets.FORGE_ARTIFACTORY_TOKEN }}
+      ARTIFACTORY_USERNAME: ${{ secrets.FORGE_ARTIFACTORY_USERNAME }}
+      ARTIFACTORY_REGISTRY: ${{ secrets.FORGE_ARTIFACTORY_NPM_REGISTRY }}
+
+  ## This job will run on release builds when publishing a new version
+  build-and-release:
+    name: Build and Release
+    needs: wf-config
+    uses: tyler-technologies/forge-automation-shared/.github/workflows/wf-build-release.yml@v0.10.0
+    if: ${{ needs.wf-config.outputs.is-release == 'true' }}
+    with:
+      PRODUCTION_RELEASE: true
+    secrets:
+      GITHUB_APP_ID: ${{ secrets.TCP_AUTOMATION_APP_ID }}
+      GITHUB_APP_KEY: ${{ secrets.TCP_AUTOMATION_APP_KEY }}
+      ARTIFACTORY_TOKEN: ${{ secrets.FORGE_ARTIFACTORY_TOKEN }}
+      ARTIFACTORY_USERNAME: ${{ secrets.FORGE_ARTIFACTORY_USERNAME }}
+      ARTIFACTORY_REGISTRY: ${{ secrets.FORGE_ARTIFACTORY_NPM_REGISTRY }}

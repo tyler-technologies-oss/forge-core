@@ -28,7 +28,7 @@ const elementVals = {
 };
 
 describe('position-utils', function() {
-  describe('positionElement', () => {
+  describe('positionElementAsync', () => {
     beforeAll(function(this: ITestContext) {
       document.body.style.margin = '0';
       document.documentElement.style.margin = '0';
@@ -155,7 +155,7 @@ describe('position-utils', function() {
       this.context = setupTestContext();
       const { element, targetElement } = this.context;
       targetElement.style.left = '200%';
-      const position = await positionElementAsync({ element, targetElement, placement: 'right', flip: false, shift: false });
+      const position = await positionElementAsync({ element, targetElement, placement: 'right', flip: false, shift: false, hide: true });
 
       expect(position.visibility).toBe('hidden');
     });
@@ -206,7 +206,7 @@ describe('position-utils', function() {
         this.context = setupTestContext();
         const { element, targetElement } = this.context;
         targetElement.style.top = '0';
-        const position = await positionElementAsync({ element, targetElement, placement: 'top', shift: false });
+        const position = await positionElementAsync({ element, targetElement, placement: 'top', shift: false, flipOptions: {} });
 
         expect(position.y).toBe(targetVals.height);
       });
@@ -225,7 +225,7 @@ describe('position-utils', function() {
         this.context = setupTestContext();
         const { element, targetElement } = this.context;
         targetElement.style.left = '0';
-        const position = await positionElementAsync({ element, targetElement, placement: 'left', shift: false });
+        const position = await positionElementAsync({ element, targetElement, placement: 'left', shift: false, flipOptions: {} });
 
         const bounds = targetElement.getBoundingClientRect();
         expect(position.x).toBe(bounds.x + targetVals.width);

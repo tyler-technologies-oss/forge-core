@@ -12,7 +12,7 @@ import {
   createRollupBundle,
   IRollupBundleConfig,
   executeWebpack
-} from '@tylertech/build-tools';
+} from '@tylertech/forge-build-tools';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import { Configuration, Stats } from 'webpack';
