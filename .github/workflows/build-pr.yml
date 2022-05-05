@@ -5,7 +5,7 @@ on:
     paths:
       - '.github/workflows/**/*'
       - '.eslintrc.json'
-      - 'gulpfile.js'
+      - 'gulpfile.ts'
       - 'tsconfig.json'
       - 'spec/**/*'
       - 'src/**/*'
