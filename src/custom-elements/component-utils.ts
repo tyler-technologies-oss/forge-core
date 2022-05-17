@@ -24,9 +24,8 @@ export function defineCustomElements(components: any[]): void {
  * @param name The name of the custom element to define.
  * @param ctor The custom element constructor.
  */
-// tslint:disable-next-line:ban-types
 export function tryDefine(name: string, ctor: CustomElementConstructor, options?: ElementDefinitionOptions | undefined): void {
-  if (window.customElements.get(name)) {
+  if (window?.customElements?.get(name)) {
     return;
   }
   window.customElements.define(name, ctor, options);

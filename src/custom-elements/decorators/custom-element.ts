@@ -1,10 +1,19 @@
 import { isFunction } from '../../utils';
+import { defineCustomElement } from '../component-utils';
+
+declare global {
+  interface Window {
+    __forgeFlags__autoDefine: any;
+  }
+}
 
 export interface ICustomElementConfig {
   /** The name of the custom element tag. */
   name: string;
   /** Components that are dependencies of this component */
   dependencies?: any[];
+  /** Configures if the element will be automatically defined in the custom element registry. Default is `true` */
+  define?: boolean;
 }
 
 export const CUSTOM_ELEMENT_NAME_PROPERTY = '_customElementName';
@@ -15,16 +24,20 @@ export const CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY = '_customElementDependencies'
  * extend/modify the behavior of a custom element.
  * @param {ICustomElementConfig} [config={}] The custom element configuration.
  */
-export function CustomElement(config: ICustomElementConfig): any {
-  return (ctor: any) => {
+export function CustomElement({ name, dependencies, define = true }: ICustomElementConfig): any {
+  return (ctor: HTMLElement) => {
     patchConnectedCallback(ctor);
 
-    if (config.name) {
-      ctor[CUSTOM_ELEMENT_NAME_PROPERTY] = config.name;
+    if (name) {
+      ctor[CUSTOM_ELEMENT_NAME_PROPERTY] = name;
     }
     
-    if (config.dependencies && config.dependencies.length) {
-      ctor[CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY] = config.dependencies;
+    if (dependencies && dependencies.length) {
+      ctor[CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY] = dependencies;
+    }
+
+    if (window.__forgeFlags__autoDefine !== false && define) {
+      defineCustomElement(ctor);
     }
   };
 }
