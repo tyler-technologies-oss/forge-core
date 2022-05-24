@@ -1,6 +1,17 @@
 import * as Utils from '@tylertech/forge-core/utils/utils';
 
 describe('Utils', () => {
+  describe('randomChars', () => {
+    it('should return default of 5 characters', () => {
+      expect(Utils.randomChars().length).toBe(5);
+    });
+
+    it('should return custom length string', () => {
+      const len = 10;
+      expect(Utils.randomChars(len).length).toBe(len);
+    });
+  });
+
   describe('isDefined', () => {
     it('should return true when defined', () => {
       const test = true;

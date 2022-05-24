@@ -1,6 +1,7 @@
 /** Generates random characters. Defaults to a length of 5. */
 export function randomChars(length = 5): string {
-  return Math.random().toString(36).substring(2, length);
+  const skip = 2; // Skip the first two chars which are always "0."
+  return Math.random().toString(36).substring(skip, skip + length);
 }
 
 /**
