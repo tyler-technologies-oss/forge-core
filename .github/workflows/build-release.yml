@@ -16,6 +16,7 @@ on:
       - 'tsconfig.json'
       - 'spec/**/*'
       - 'src/**/*'
+  workflow_dispatch:
 
 concurrency: build-release-${{ github.ref }}
 
