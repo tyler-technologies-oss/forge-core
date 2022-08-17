@@ -9,6 +9,7 @@ export * from './constants';
 export * from './custom-elements';
 export * from './events';
 export * from './message-list';
+export * from './resize';
 export * from './scroll';
 export * from './services';
 export * from './utils';
