@@ -13,7 +13,7 @@ export type PrefersColorSchemeValue = typeof prefersColorSchemeValues[number];
 export type PrefersReducedMotionValue = typeof prefersReducedMotionValues[number];
 
 export type MediaQueryHandlerFunction = (event: MediaQueryList | MediaQueryListEvent) => void;
-export type MediaQueryListItem = { queryList: MediaQueryList, handler: MediaQueryHandlerFunction };
+export type MediaQueryListItem = { queryList: MediaQueryList; handler: MediaQueryHandlerFunction };
 export type MediaQuerySubscriberCallback<T> = (value?: T) => void;
 
 export const associatedMediaQueryValues: Map<MediaQueryType, unknown[]> = new Map([
