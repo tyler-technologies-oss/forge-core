@@ -1,4 +1,4 @@
-export type MediaQueryType = 'any-hover' | 'any-pointer' | 'hover' | 'pointer' | 'prefers-contrast' | 'prefers-color-scheme' | 'prefers-reduced-motion';
+export type MediaFeature = 'any-hover' | 'any-pointer' | 'hover' | 'pointer' | 'prefers-contrast' | 'prefers-color-scheme' | 'prefers-reduced-motion';
 
 export const hoverValues = ['none', 'hover'] as const;
 export const pointerValues = ['none', 'coarse', 'fine'] as const;
@@ -12,16 +12,15 @@ export type PrefersContrastValue = typeof prefersContrastValues[number];
 export type PrefersColorSchemeValue = typeof prefersColorSchemeValues[number];
 export type PrefersReducedMotionValue = typeof prefersReducedMotionValues[number];
 
-export type MediaQueryHandlerFunction = (event: MediaQueryList | MediaQueryListEvent) => void;
-export type MediaQueryListItem = { queryList: MediaQueryList; handler: MediaQueryHandlerFunction };
-export type MediaQuerySubscriberCallback<T> = (value?: T) => void;
+export type MediaQueryHandler = (event: MediaQueryList | MediaQueryListEvent) => void;
+export type MediaQueryListItem = { query: MediaQueryList; handler: MediaQueryHandler };
 
-export const associatedMediaQueryValues: Map<MediaQueryType, unknown[]> = new Map([
-  ['any-hover', Array.from(hoverValues.values()) as unknown[]],
-  ['any-pointer', Array.from(pointerValues.values()) as unknown[]],
-  ['hover', Array.from(hoverValues.values()) as unknown[]],
-  ['pointer', Array.from(pointerValues.values()) as unknown[]],
-  ['prefers-contrast', Array.from(prefersContrastValues.values()) as unknown[]],
-  ['prefers-color-scheme', Array.from(prefersColorSchemeValues.values()) as unknown[]],
-  ['prefers-reduced-motion', Array.from(prefersReducedMotionValues.values()) as unknown[]]
+export const mediaFeatureValues = new Map([
+  ['any-hover', Array.from(hoverValues.values()) as string[]],
+  ['any-pointer', Array.from(pointerValues.values())],
+  ['hover', Array.from(hoverValues.values())],
+  ['pointer', Array.from(pointerValues.values())],
+  ['prefers-contrast', Array.from(prefersContrastValues.values())],
+  ['prefers-color-scheme', Array.from(prefersColorSchemeValues.values())],
+  ['prefers-reduced-motion', Array.from(prefersReducedMotionValues.values())]
 ]);
