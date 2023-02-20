@@ -1,19 +1,62 @@
-import { MediaFeature } from './types';
+import { ALL_MEDIA_FEATURES, IMediaRange, MediaFeature, NamedMediaQuery, RangeMediaFeature } from './types';
 
-/**
- *
- * @param feature A media query feature name.
- * @param params
- * @returns
- */
-export function getMediaFeatureValue<T extends string = MediaFeature, V extends string = string>(feature: T, params: V[]): V {
-  for (const param of params) {
-    const query = window.matchMedia(`(${feature}: ${param})`);
-    if (query.matches) {
-      return param;
+export function getMatchingValues(namedQueries: NamedMediaQuery[]): string[] {
+  const values: string[] = [];
+  for (const namedQuery of namedQueries) {
+    const queryList = window.matchMedia(namedQuery.query);
+    if (queryList.matches) {
+      values.push(namedQuery.name);
+    }
+  }
+  return values;
+}
+
+export function getMatchingValue(namedQueries: NamedMediaQuery[]): string {
+  for (const namedQuery of namedQueries) {
+    const queryList = window.matchMedia(namedQuery.query);
+    if (queryList.matches) {
+      return namedQuery.name;
     }
   }
   // We can assume that at least one query will match, this fallback is mostly to satisfy TypeScript
-  console.warn(`The ${feature} media feature found no matches, falling back to ${params[0]}.`)
-  return params[0];
+  console.warn(`No media query returned a match, falling back to ${namedQueries[0].name}.`)
+  return namedQueries[0].name;
+}
+
+export function getBooleanValue(query: NamedMediaQuery): boolean {
+  return window.matchMedia(query.query).matches;
+}
+
+/** Returns a CSS media query string from a range. */
+export function getRangeQuery(feature: RangeMediaFeature, range: IMediaRange): string {
+  if (range.equals !== undefined) {
+    return `(${feature}: ${range.equals})`;
+  }
+
+  const rules: string[] = [];
+  if (range.min !== undefined) {
+    rules.push(`(min-${feature}: ${range.min})`);
+  }
+  if (range.max !== undefined) {
+    rules.push(`(max-${feature}: ${range.max})`);
+  }
+  return rules.join(' and ');
+}
+
+export function isMediaFeature(value: string): value is MediaFeature {
+  return ALL_MEDIA_FEATURES.includes(value as MediaFeature);
+}
+
+/** Return `undefined` if the name is a reserved media feature. */
+export function validateName(name?: string): string | undefined {
+  if (!name) {
+    return undefined;
+  }
+
+  if (isMediaFeature(name)) {
+    console.error(`${name} is a disallowed media observer name.`);
+    return undefined;
+  }
+
+  return name;
 }
