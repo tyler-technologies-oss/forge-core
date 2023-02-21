@@ -1,5 +1,6 @@
 import { ALL_MEDIA_FEATURES, IMediaRange, MediaFeature, NamedMediaQuery, RangeMediaFeature } from './types';
 
+/** Returns the names of all queries that match. Used for range media features. */
 export function getMatchingValues(namedQueries: NamedMediaQuery[]): string[] {
   const values: string[] = [];
   for (const namedQuery of namedQueries) {
@@ -11,6 +12,7 @@ export function getMatchingValues(namedQueries: NamedMediaQuery[]): string[] {
   return values;
 }
 
+/** Returns the name of one query that matches. Used for discrete media features. */
 export function getMatchingValue(namedQueries: NamedMediaQuery[]): string {
   for (const namedQuery of namedQueries) {
     const queryList = window.matchMedia(namedQuery.query);
@@ -23,6 +25,7 @@ export function getMatchingValue(namedQueries: NamedMediaQuery[]): string {
   return namedQueries[0].name;
 }
 
+/** Returns whether a query matches. */
 export function getBooleanValue(query: NamedMediaQuery): boolean {
   return window.matchMedia(query.query).matches;
 }
@@ -43,6 +46,7 @@ export function getRangeQuery(feature: RangeMediaFeature, range: IMediaRange): s
   return rules.join(' and ');
 }
 
+/** Whether a string is the name of a media feature. */
 export function isMediaFeature(value: string): value is MediaFeature {
   return ALL_MEDIA_FEATURES.includes(value as MediaFeature);
 }
