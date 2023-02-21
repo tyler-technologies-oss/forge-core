@@ -19,43 +19,45 @@ export class MediaObserver<T> extends Subject<T> {
   public static observe(feature: DiscreteMediaFeature, options?: IMediaObserverOptions): DiscreteMediaObserver {
     const name = validateName(options?.name) ?? feature;
     const existing = MediaObserver._getObserver<DiscreteMediaObserver, string>(name);
-    if (existing && !options?.createNew) {
+    if (existing && options?.track !== false) {
       return existing;
     }
 
     return DiscreteMediaObserver.create(feature);
   }
 
-  /** Returns a new media observer tracking a discrete feature. */
+  /** Returns a media observer tracking a discrete feature. */
   public static observeDiscrete(feature: DiscreteMediaFeature, options?: IMediaObserverOptions): DiscreteMediaObserver {
     return MediaObserver.observe(feature, options);
   }
 
-  /** Returns a new media oberserver tracking a range feature. */
-  public static observeRange(feature: RangeMediaFeature, constraints: IMediaRange[], options?: IMediaObserverOptions): RangeMediaObserver {
+  /** Returns a media oberserver tracking a range feature. */
+  public static observeRange(feature: RangeMediaFeature, constraints: IMediaRange | IMediaRange[], options?: IMediaObserverOptions): RangeMediaObserver {
     const name = validateName(options?.name) ?? feature;
     const existing = MediaObserver._getObserver<RangeMediaObserver, string[]>(name);
-    if (existing && !options?.createNew) {
+    if (existing && options?.track !== false) {
       return existing;
     }
 
-    return RangeMediaObserver.create(feature, constraints, options);
+    return RangeMediaObserver.create(feature, Array.isArray(constraints) ? constraints : [constraints], options);
   }
 
+  /** Returns a media observer tracking a feature that evaluates to a boolean value. */
   public static observeBoolean(feature: BooleanMediaFeature, options?: IMediaObserverOptions): BooleanMediaObserver {
     const name = validateName(options?.name) ?? `${feature}-bool`;
     const existing = MediaObserver._getObserver<BooleanMediaObserver, boolean>(name);
-    if (existing && !options?.createNew) {
+    if (existing && options?.track !== false) {
       return existing;
     }
 
     return BooleanMediaObserver.create(feature, options);
   }
 
+  /** Returns a media observer tracking any media query. */
   public static observeCustom(query: string, options?: IMediaObserverOptions): CustomMediaObserver {
     const name = validateName(options?.name) ?? query;
     const existing = MediaObserver._getObserver<CustomMediaObserver, MediaQueryList | MediaQueryListEvent>(name);
-    if (existing && !options?.createNew) {
+    if (existing && options?.track !== false) {
       return existing;
     }
 
@@ -82,12 +84,14 @@ export class MediaObserver<T> extends Subject<T> {
   private _queries: ManagedMediaQuery[] = [];
 
   // eslint-disable-next-line @tylertech-eslint/require-private-modifier
-  protected constructor(name: string, namedQueries: NamedMediaQuery[], value: T) {
+  protected constructor(name: string, namedQueries: NamedMediaQuery[], value: T, track = true) {
     super(value);
     this._name = name;
     this._queries = this._attachMediaQueries(namedQueries);
 
-    MediaObserver._observers[name] = this;
+    if (track) {
+      MediaObserver._observers[name] = this;
+    }
   }
 
   /** Removes the `MediaObserver` and all created event listeners. */
@@ -119,10 +123,10 @@ export class MediaObserver<T> extends Subject<T> {
  */
 export class DiscreteMediaObserver extends MediaObserver<string> {
   public static create(feature: DiscreteMediaFeature, options?: IMediaObserverOptions): DiscreteMediaObserver {
-    const namedQueries: NamedMediaQuery[] = mediaFeatureValues[feature as keyof typeof mediaFeatureValues].map(featureValue => ({ name: featureValue.toString(), query: `(${name}: ${featureValue})` }));
+    const namedQueries: NamedMediaQuery[] = mediaFeatureValues[feature as keyof typeof mediaFeatureValues].map(featureValue => ({ name: featureValue.toString(), query: `(${feature}: ${featureValue})` }));
     const value = getMatchingValue(namedQueries);
     const name = validateName(options?.name) ?? feature;
-    return new DiscreteMediaObserver(name, namedQueries, value);
+    return new DiscreteMediaObserver(name, namedQueries, value, options?.track !== false);
   }
 
   protected override _setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void {
@@ -141,7 +145,7 @@ export class RangeMediaObserver extends MediaObserver<string[]> {
     const namedQueries: NamedMediaQuery[] = constraints.map(constraint => ({ query: getRangeQuery(feature, constraint), name: constraint.name }));
     const value = getMatchingValues(namedQueries);
     const name = validateName(options?.name) ?? feature;
-    return new RangeMediaObserver(name, namedQueries, value);
+    return new RangeMediaObserver(name, namedQueries, value, options?.track !== false);
   }
 
   protected override _setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void {
@@ -166,7 +170,7 @@ export class BooleanMediaObserver extends MediaObserver<boolean> {
     const namedQuery: NamedMediaQuery[] = [{ query: `(${feature})`, name: '' }];
     const value = getBooleanValue(namedQuery[0]);
     const name = validateName(options?.name) ?? `${feature}-bool`;
-    return new BooleanMediaObserver(name, namedQuery, value);
+    return new BooleanMediaObserver(name, namedQuery, value, options?.track !== false);
   }
 
   protected override _setValue(value: MediaQueryList | MediaQueryListEvent, _: never): void {
@@ -182,7 +186,7 @@ export class CustomMediaObserver extends MediaObserver<MediaQueryList | MediaQue
     const namedQuery: NamedMediaQuery[] = [{ query, name: '' }];
     const value = window.matchMedia(query);
     const name = validateName(options?.name) ?? query;
-    return new CustomMediaObserver(name, namedQuery, value);
+    return new CustomMediaObserver(name, namedQuery, value, options?.track !== false);
   }
 
   protected override _setValue(value: MediaQueryList | MediaQueryListEvent, _: never): void {

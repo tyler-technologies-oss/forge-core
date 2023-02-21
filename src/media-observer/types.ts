@@ -118,7 +118,7 @@ export const mediaFeatureValues = {
 
 export interface IMediaObserverOptions {
   name?: string;
-  createNew?: boolean;
+  track?: boolean;
 }
 
 export interface IMediaRange {
