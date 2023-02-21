@@ -19,7 +19,7 @@ export function getMatchingValue(namedQueries: NamedMediaQuery[]): string {
     }
   }
   // We can assume that at least one query will match, this fallback is mostly to satisfy TypeScript
-  console.warn(`No media query returned a match, falling back to ${namedQueries[0].name}.`)
+  console.warn(`No media query returned a match, falling back to ${namedQueries[0].name}.`);
   return namedQueries[0].name;
 }
 

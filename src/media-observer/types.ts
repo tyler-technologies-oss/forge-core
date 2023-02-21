@@ -118,7 +118,6 @@ export const mediaFeatureValues = {
 
 export interface IMediaObserverOptions {
   name?: string;
-  aliases?: Map<string, string>;
   createNew?: boolean;
 }
 
