@@ -1,3 +1,15 @@
+# v2.2.0 (Wed Feb 22 2023)
+
+#### 🚀 Enhancement
+
+- feat(media-observer): create media observer [#5](https://github.com/tyler-technologies-oss/forge-core/pull/5) ([@samrichardsontylertech](https://github.com/samrichardsontylertech))
+
+#### Authors: 1
+
+- Sam Richardson ([@samrichardsontylertech](https://github.com/samrichardsontylertech))
+
+---
+
 # v2.1.0 (Thu Aug 18 2022)
 
 :tada: This release contains work from a new contributor! :tada:
