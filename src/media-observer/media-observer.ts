@@ -148,15 +148,34 @@ export class RangeMediaObserver extends MediaObserver<string[]> {
     return new RangeMediaObserver(name, namedQueries, value, options?.track !== false);
   }
 
-  protected override _setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void {
-    const index = this._source.indexOf(name);
+  private _isAwaitingQueries: boolean;
+  private _valueQueue: string[];
+  private _isInitialized: boolean;
 
-    if (index === -1 && value.matches) {
-      this._next([...this._source, name]);
-    } else if (index > -1 && !value.matches) {
-      const newSource = [...this._source];
-      newSource.splice(index, 1);
-      this._next(newSource);
+  // eslint-disable-next-line @tylertech-eslint/require-private-modifier
+  private constructor(name: string, namedQueries: NamedMediaQuery[], value: string[], track = true) {
+    super(name, namedQueries, value, track);
+    this._isAwaitingQueries = false;
+    this._valueQueue = [];
+    this._isInitialized = true;
+  }
+
+  protected override _setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void {
+    if (!this._isInitialized) {
+      return;
+    }
+
+    if (value.matches) {
+      this._valueQueue.push(name);
+    }
+
+    if (!this._isAwaitingQueries) {
+      setTimeout(() => {
+        this._next([...this._valueQueue]);
+        this._valueQueue = [];
+        this._isAwaitingQueries = false;
+      }, 1);
+      this._isAwaitingQueries = true;
     }
   }
 }
