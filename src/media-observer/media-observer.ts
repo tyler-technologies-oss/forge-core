@@ -174,7 +174,7 @@ export class RangeMediaObserver extends MediaObserver<string[]> {
         this._next([...this._valueQueue]);
         this._valueQueue = [];
         this._isAwaitingQueries = false;
-      }, 1);
+      });
       this._isAwaitingQueries = true;
     }
   }
