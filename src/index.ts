@@ -8,6 +8,7 @@ export * from './a11y';
 export * from './constants';
 export * from './custom-elements';
 export * from './events';
+export * from './media-observer';
 export * from './message-list';
 export * from './resize';
 export * from './scroll';
