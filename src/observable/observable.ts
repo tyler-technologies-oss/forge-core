@@ -1,39 +1,41 @@
 import { Observer } from './types';
 
 export class Subject<T> {
-  protected _source: T;
-  protected _subscribers: Subscription<T>[] = [];
+  protected source: T;
+  protected subscribers: Subscription<T>[] = [];
   public get value(): T {
-    return this._source;
+    return this.source;
   }
 
   constructor(value: T) {
-    this._source = value;
+    this.source = value;
   }
 
   public subscribe(observer?: Observer<T>): Subscription<T> {
-    const subscription = new Subscription(this._subscribers, observer);
-    this._subscribers.push(subscription);
-    observer?.(this._source);
+    const subscription = new Subscription(this.subscribers, observer);
+    this.subscribers.push(subscription);
+    observer?.(this.source);
     return subscription;
   }
 
-  protected _next(value: T): void {
-    this._source = value;
-    for (const subscriber of this._subscribers) {
+  // eslint-disable-next-line @tylertech-eslint/require-private-modifier
+  protected next(value: T): void {
+    this.source = value;
+    for (const subscriber of this.subscribers) {
       // eslint-disable-next-line @typescript-eslint/dot-notation
-      subscriber['_observer']?.(value);
+      subscriber.observer?.(value);
     }
   }
 
-  protected _complete(): void {
-    this._subscribers = [];
+  // eslint-disable-next-line @tylertech-eslint/require-private-modifier
+  protected complete(): void {
+    this.subscribers = [];
   }
 }
 
 export class Subscription<T> {
+  public readonly observer?: Observer<T>;
   private _parent: Subscription<T>[];
-  private _observer?: Observer<T>;
 
   private _closed = false;
   public get closed(): boolean {
@@ -41,8 +43,8 @@ export class Subscription<T> {
   };
 
   constructor(parent: Subscription<T>[], observer?: Observer<T>) {
+    this.observer = observer;
     this._parent = parent;
-    this._observer = observer;
   }
 
   public unsubscribe(): void {

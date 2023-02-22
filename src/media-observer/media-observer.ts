@@ -136,14 +136,14 @@ export abstract class MediaObserver<T> extends Subject<T> {
   private _attachMediaQueries(namedQueries: NamedMediaQuery[]): ManagedMediaQuery[] {
     return namedQueries.map(({name, query}) => {
       const queryList = window.matchMedia(query);
-      const handler: MediaQueryHandler = (event) => this._setValue(event, name);
+      const handler: MediaQueryHandler = (event) => this.setValue(event, name);
       handler(queryList);
       queryList.addEventListener('change', handler);
       return { queryList, handler };
     });
   }
 
-  protected abstract _setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void;
+  protected abstract setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void;
 }
 
 /**
@@ -157,11 +157,12 @@ export class DiscreteMediaObserver extends MediaObserver<string> {
     return new DiscreteMediaObserver(name, namedQueries, value, options?.track !== false);
   }
 
-  protected override _setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void {
+  // eslint-disable-next-line @tylertech-eslint/require-private-modifier
+  protected override setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void {
     if (!value.matches) {
       return;
     }
-    this._next(name);
+    this.next(name);
   }
 }
 
@@ -188,7 +189,8 @@ export class RangeMediaObserver extends MediaObserver<string[]> {
     this._isInitialized = true;
   }
 
-  protected override _setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void {
+  // eslint-disable-next-line @tylertech-eslint/require-private-modifier
+  protected override setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void {
     if (!this._isInitialized) {
       return;
     }
@@ -199,7 +201,7 @@ export class RangeMediaObserver extends MediaObserver<string[]> {
 
     if (!this._isAwaitingQueries) {
       setTimeout(() => {
-        this._next([...this._valueQueue]);
+        this.next([...this._valueQueue]);
         this._valueQueue = [];
         this._isAwaitingQueries = false;
       });
@@ -220,8 +222,9 @@ export class BooleanMediaObserver extends MediaObserver<boolean> {
     return new BooleanMediaObserver(name, namedQuery, value, options?.track !== false);
   }
 
-  protected override _setValue(value: MediaQueryList | MediaQueryListEvent, _: never): void {
-    this._next(value.matches);
+  // eslint-disable-next-line @tylertech-eslint/require-private-modifier
+  protected override setValue(value: MediaQueryList | MediaQueryListEvent, _: never): void {
+    this.next(value.matches);
   }
 }
 
@@ -236,7 +239,8 @@ export class CustomMediaObserver extends MediaObserver<MediaQueryList | MediaQue
     return new CustomMediaObserver(name, namedQuery, value, options?.track !== false);
   }
 
-  protected override _setValue(value: MediaQueryList | MediaQueryListEvent, _: never): void {
-    this._next(value);
+  // eslint-disable-next-line @tylertech-eslint/require-private-modifier
+  protected override setValue(value: MediaQueryList | MediaQueryListEvent, _: never): void {
+    this.next(value);
   }
 }
