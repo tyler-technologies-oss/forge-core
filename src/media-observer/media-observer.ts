@@ -6,7 +6,7 @@ import { BooleanMediaFeature, IMediaObserverOptions, IMediaRange, ManagedMediaQu
  * A Subject that tracks the value of a media feature and exposes it synchronously and
  * asynchronously.
  */
-export class MediaObserver<T> extends Subject<T> {
+export abstract class MediaObserver<T> extends Subject<T> {
 
   /**
    * STATIC MEMBERS
@@ -143,9 +143,7 @@ export class MediaObserver<T> extends Subject<T> {
     });
   }
 
-  protected _setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void {
-    throw new Error('Method not implemented in base class.');
-  }
+  protected abstract _setValue(value: MediaQueryList | MediaQueryListEvent, name: string): void;
 }
 
 /**
