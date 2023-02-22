@@ -15,8 +15,15 @@ export class MediaObserver<T> extends Subject<T> {
   /** A collection of all managed media observers. */
   private static _observers: { [key: string]: MediaObserver<any> } = {};
 
-  /** Returns a new media observer tracking a discrete feature. */
-  public static observe(feature: DiscreteMediaFeature, options?: IMediaObserverOptions): DiscreteMediaObserver {
+  /**
+   * Returns a new media observer tracking a discrete feature.
+   * @param feature The name of a discrete media feature.
+   * @param options An options object with the following properties:
+   * - `name`: The name to track the observer by. The feature name is used if unsupplied.
+   * - `track`: Whether to make the observer available globally.
+   * @returns A `DiscreteMediaObserver` tracking the given feature.
+   */
+  public static observeDiscrete(feature: DiscreteMediaFeature, options?: IMediaObserverOptions): DiscreteMediaObserver {
     const name = validateName(options?.name) ?? feature;
     const existing = MediaObserver._getObserver<DiscreteMediaObserver, string>(name);
     if (existing && options?.track !== false) {
@@ -26,12 +33,20 @@ export class MediaObserver<T> extends Subject<T> {
     return DiscreteMediaObserver.create(feature);
   }
 
-  /** Returns a media observer tracking a discrete feature. */
-  public static observeDiscrete(feature: DiscreteMediaFeature, options?: IMediaObserverOptions): DiscreteMediaObserver {
-    return MediaObserver.observe(feature, options);
-  }
-
   /** Returns a media oberserver tracking a range feature. */
+  /**
+   * Returns a new media observer tracking a range feature.
+   * @param feature The name of a range media feature.
+   * @param constraints One or more ranges to track. A range includes the following properties:
+   * - `name`: A label for the range used to set the observer's value.
+   * - `min`: The lowest value in the range (optional).
+   * - `max`: The highest value in the range (optional).
+   * - `equals`: A single value to match, supersedes `min` and `max` (optional).
+   * @param options An options object with the following properties:
+   * - `name`: The name to track the observer by. The feature name is used if unsupplied.
+   * - `track`: Whether to make the observer available globally.
+   * @returns A `RangeMediaObserver` tracking the given feature.
+   */
   public static observeRange(feature: RangeMediaFeature, constraints: IMediaRange | IMediaRange[], options?: IMediaObserverOptions): RangeMediaObserver {
     const name = validateName(options?.name) ?? feature;
     const existing = MediaObserver._getObserver<RangeMediaObserver, string[]>(name);
@@ -42,7 +57,14 @@ export class MediaObserver<T> extends Subject<T> {
     return RangeMediaObserver.create(feature, Array.isArray(constraints) ? constraints : [constraints], options);
   }
 
-  /** Returns a media observer tracking a feature that evaluates to a boolean value. */
+  /**
+   * Returns a media observer tracking a feature that evaluates to a boolean value.
+   * @param feature The name of a media feature that can be expressed as a boolean.
+   * @param options An options object with the following properties:
+   * - `name`: The name to track the observer by. The feature name plus '-bool' is used if unsupplied.
+   * - `track`: Whether to make the observer available globally.
+   * @returns A `BooleanMediaObserver` tracking the given feature.
+   */
   public static observeBoolean(feature: BooleanMediaFeature, options?: IMediaObserverOptions): BooleanMediaObserver {
     const name = validateName(options?.name) ?? `${feature}-bool`;
     const existing = MediaObserver._getObserver<BooleanMediaObserver, boolean>(name);
@@ -54,6 +76,14 @@ export class MediaObserver<T> extends Subject<T> {
   }
 
   /** Returns a media observer tracking any media query. */
+  /**
+   * Returns a media observer tracking any media query.
+   * @param query Any media query.
+   * @param options An options object with the following properties:
+   * - `name`: The name to track the observer by. The entire query string is used if unsupplied.
+   * - `track`: Whether to make the observer available globally.
+   * @returns A `CustomMediaObserver` tracking the given query.
+   */
   public static observeCustom(query: string, options?: IMediaObserverOptions): CustomMediaObserver {
     const name = validateName(options?.name) ?? query;
     const existing = MediaObserver._getObserver<CustomMediaObserver, MediaQueryList | MediaQueryListEvent>(name);
