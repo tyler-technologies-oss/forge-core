@@ -1,3 +1,15 @@
+# v2.2.1 (Thu Feb 23 2023)
+
+#### 🐛 Bug Fix
+
+- fix(media-observer): add missing features to boolean media feature type [#6](https://github.com/tyler-technologies-oss/forge-core/pull/6) ([@samrichardsontylertech](https://github.com/samrichardsontylertech))
+
+#### Authors: 1
+
+- Sam Richardson ([@samrichardsontylertech](https://github.com/samrichardsontylertech))
+
+---
+
 # v2.2.0 (Wed Feb 22 2023)
 
 #### 🚀 Enhancement
