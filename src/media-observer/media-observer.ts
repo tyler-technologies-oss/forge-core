@@ -33,7 +33,7 @@ export abstract class MediaObserver<T> extends Subject<T> {
     return DiscreteMediaObserver.create(feature);
   }
 
-  /** Returns a media oberserver tracking a range feature. */
+  /** Returns a media observer tracking a range feature. */
   /**
    * Returns a new media observer tracking a range feature.
    * @param feature The name of a range media feature.

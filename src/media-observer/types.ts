@@ -35,6 +35,7 @@ export const BOOLEAN_MEDIA_FEATURES = [
   'any-pointer',
   'color',
   'color-index',
+  'dynamic-range',
   'forced-colors',
   'grid',
   'height',
@@ -44,8 +45,11 @@ export const BOOLEAN_MEDIA_FEATURES = [
   'overflow-block',
   'overflow-inline',
   'pointer',
+  'prefers-contrast',
+  'prefers-reduced-motion',
   'scripting',
   'update',
+  'video-dynamic-range',
   'width'
 ] as const;
 
