@@ -1,3 +1,15 @@
+# v2.2.2 (Mon Feb 27 2023)
+
+#### 🐛 Bug Fix
+
+- fix(media-observer): maintain untouched values in range media observer [#7](https://github.com/tyler-technologies-oss/forge-core/pull/7) ([@samrichardsontylertech](https://github.com/samrichardsontylertech))
+
+#### Authors: 1
+
+- Sam Richardson ([@samrichardsontylertech](https://github.com/samrichardsontylertech))
+
+---
+
 # v2.2.1 (Thu Feb 23 2023)
 
 #### 🐛 Bug Fix
