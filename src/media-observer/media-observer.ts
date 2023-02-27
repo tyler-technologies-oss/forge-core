@@ -195,17 +195,21 @@ export class RangeMediaObserver extends MediaObserver<string[]> {
       return;
     }
 
-    if (value.matches) {
-      this._valueQueue.push(name);
-    }
-
     if (!this._isAwaitingQueries) {
       setTimeout(() => {
         this.next([...this._valueQueue]);
         this._valueQueue = [];
         this._isAwaitingQueries = false;
       });
+      this._valueQueue = [...this.source];
       this._isAwaitingQueries = true;
+    }
+
+    const index = this._valueQueue.findIndex(queued => queued === name);
+    if (value.matches && index === -1) {
+      this._valueQueue.push(name);
+    } else if (!value.matches && index > -1) {
+      this._valueQueue.splice(index, 1);
     }
   }
 }
