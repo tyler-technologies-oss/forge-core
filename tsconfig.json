@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "ES2015",
+    "target": "ES2020",
+    "module": "ES2020",
     "moduleResolution": "node",
-    "lib": ["dom", "es2015", "es2017"],
+    "lib": ["dom", "es2020"],
     "noImplicitAny": false,
     "sourceMap": true,
     "allowJs": false,
@@ -11,7 +11,7 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "noEmitHelpers": true,
-    "forceConsistentCasingInFileNames": true, 
+    "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
@@ -22,12 +22,7 @@
       "@tylertech/forge-core/*": ["src/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "auto.config.ts",
-    "gulpfile.ts"
-  ],
+  "exclude": ["node_modules", "dist", "auto.config.ts", "gulpfile.ts"],
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs"
