@@ -724,12 +724,13 @@ export function deepQuerySelectorAll(rootElement: Element, selectors: string | s
 
 /** 
  * Gets the currently focused element within the document by also traversing shadow roots.
+ * @param {Document} doc The document to get the active element from. Defaults to the current document.
  * @returns {Element}
  */
-export function getActiveElement(): Element {
-  const activeElement = document.activeElement;
+export function getActiveElement(doc = document): Element {
+  const activeElement = doc.activeElement;
 
-  if (!activeElement || activeElement === document.body) {
+  if (!activeElement || activeElement === doc.body) {
     return activeElement as HTMLElement;
   }
 
