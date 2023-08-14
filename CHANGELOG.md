@@ -1,3 +1,15 @@
+# v2.3.0 (Fri Aug 04 2023)
+
+#### 🚀 Enhancement
+
+- feat(dom-utils): allow for specifying `document` instance in `getActiveElement()` [#9](https://github.com/tyler-technologies-oss/forge-core/pull/9) ([@DRiFTy17](https://github.com/DRiFTy17))
+
+#### Authors: 1
+
+- Kieran Nichols ([@DRiFTy17](https://github.com/DRiFTy17))
+
+---
+
 # v2.2.2 (Mon Feb 27 2023)
 
 #### 🐛 Bug Fix
