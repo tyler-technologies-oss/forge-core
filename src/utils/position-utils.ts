@@ -20,10 +20,14 @@ import { topLayer as topLayerMiddleware } from './top-layer-middleware';
 export type PositionPlacement = Placement;
 export type PositionStrategy = Strategy;
 
-export interface IElementPositionResult {
-  visibility: 'visible' | 'hidden';
+/** @deprecated Will be removed in next major version, use `offsetOptions` instead. */
+export interface IElementPosition {
   x: number;
   y: number;
+}
+
+export interface IElementPositionResult extends IElementPosition {
+  visibility: 'visible' | 'hidden';
 }
 
 export interface IPositionElementConfig {
@@ -52,7 +56,7 @@ export interface IPositionElementConfig {
   /** Options to provide to the autoPlacement middleware. */
   autoOptions?: Partial<AutoPlacementOptions>;
   /** Should any offset values be applied to the element. */
-  offset?: boolean;
+  offset?: boolean | IElementPosition;
   /**  */
   offsetOptions?: Partial<OffsetOptions>;
   /** Should the top-layer middleware be applied or not. */
@@ -64,6 +68,17 @@ export interface IPositionElementConfig {
   /** The CSS `translate` function to apply to the `transform`. Only applied when `transform` is `true`. */
   translateFunction?: 'translate3d' | 'translate';
 }
+
+/** Adjusts the x and y axes by a specified offset amount. */
+export const positionOffsetMiddleware = ({ x: offsetX, y: offsetY }: IElementPosition): Middleware => ({
+  name: 'positionOffset',
+  fn({ x, y }) {
+    return {
+      x: x + offsetX,
+      y: y + offsetY
+    };
+  }
+});
 
 /**
  * Calculates an elements position relative to another element.
@@ -97,7 +112,11 @@ export async function positionElementAsync({
 
   // Order of the following middleware is **important**
   if (offset) {
-    middleware.push(offsetMiddleware(offsetOptions));
+    if (typeof offset === 'object' && (offset.hasOwnProperty('x') || offset.hasOwnProperty('y'))) {
+      middleware.push(positionOffsetMiddleware(offset));
+    } else {
+      middleware.push(offsetMiddleware(offsetOptions));
+    }
   }
   if (shift) {
     middleware.push(shiftMiddleware(shiftOptions));
