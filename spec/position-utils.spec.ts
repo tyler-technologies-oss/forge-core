@@ -1,3 +1,4 @@
+import { OffsetOptions } from '@floating-ui/dom';
 import { IElementPosition, positionElementAsync } from '@tylertech/forge-core';
 
 interface ITestContext {
@@ -144,13 +145,23 @@ describe('position-utils', function() {
     it('should position with offset', async function(this: ITestContext) {
       this.context = setupTestContext();
       const { element, targetElement } = this.context;
+      const offsetOptions: OffsetOptions = { mainAxis: -10, crossAxis: -10 };
+      const position = await positionElementAsync({ element, targetElement, placement: 'top', flip: false, shift: false, offset: true, offsetOptions });
+
+      expect(position.x).withContext('Expected x to be calculated correctly').toBe((targetVals.x + (targetVals.width / 2)) - (elementVals.width / 2) + offsetOptions.crossAxis!);
+      expect(position.y).withContext('Expected y to be calculated correctly').toBe((targetVals.y - elementVals.height) - offsetOptions.mainAxis!);
+    });
+
+    it('should position with specific x and y offset', async function(this: ITestContext) {
+      this.context = setupTestContext();
+      const { element, targetElement } = this.context;
       const offset: IElementPosition = { x: -10, y: -10 };
       const position = await positionElementAsync({ element, targetElement, placement: 'top', flip: false, shift: false, offset });
 
       expect(position.x).withContext('Expected x to be calculated correctly').toBe((targetVals.x + (targetVals.width / 2)) - (elementVals.width / 2) + offset.x);
       expect(position.y).withContext('Expected y to be calculated correctly').toBe((targetVals.y - elementVals.height) + offset.y);
     });
-
+  
     it('should hide when target is not within viewport', async function(this: ITestContext) {
       this.context = setupTestContext();
       const { element, targetElement } = this.context;

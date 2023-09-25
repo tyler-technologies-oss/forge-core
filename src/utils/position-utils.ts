@@ -1,21 +1,26 @@
-import { Options as FlipOptions } from '@floating-ui/core/src/middleware/flip';
-import { Options as AutoOptions } from '@floating-ui/core/src/middleware/autoPlacement';
-import { Options as ShiftOptions } from '@floating-ui/core/src/middleware/shift';
-import { Options as HideOptions } from '@floating-ui/core/src/middleware/hide';
 import {
   computePosition,
   flip as flipMiddleware,
   hide as hideMiddleware,
   shift as shiftMiddleware,
+  offset as offsetMiddleware,
+  FlipOptions,
+  ShiftOptions,
+  AutoPlacementOptions,
+  HideOptions,
   autoPlacement as autoPlacementMiddleware,
   Middleware,
   Placement,
-  Strategy
+  Strategy,
+  OffsetOptions
 } from '@floating-ui/dom';
+import { getContainingBlock } from '@floating-ui/utils/dom';
+import { topLayer as topLayerMiddleware } from './top-layer-middleware';
 
 export type PositionPlacement = Placement;
 export type PositionStrategy = Strategy;
 
+/** @deprecated Will be removed in next major version, use `offsetOptions` instead. */
 export interface IElementPosition {
   x: number;
   y: number;
@@ -49,12 +54,16 @@ export interface IPositionElementConfig {
   /** Should the element automatically attempt to locate the best placement, */
   auto?: boolean;
   /** Options to provide to the autoPlacement middleware. */
-  autoOptions?: Partial<AutoOptions>;
-  /** Offset positioning to apply to the placement. */
-  offset?: IElementPosition;
+  autoOptions?: Partial<AutoPlacementOptions>;
+  /** Should any offset values be applied to the element. */
+  offset?: boolean | IElementPosition;
+  /**  */
+  offsetOptions?: Partial<OffsetOptions>;
+  /** Should the top-layer middleware be applied or not. */
+  topLayer?: boolean;
   /** The positioning strategy. */
   strategy?: PositionStrategy;
-  /** Should positining be applied using a `transform` style. */
+  /** Should positioning be applied using a `transform` style. */
   transform?: boolean;
   /** The CSS `translate` function to apply to the `transform`. Only applied when `transform` is `true`. */
   translateFunction?: 'translate3d' | 'translate';
@@ -80,7 +89,8 @@ export async function positionElementAsync({
   element,
   targetElement,
   placement = 'bottom-start',
-  offset,
+  offset = false,
+  offsetOptions,
   strategy = 'absolute',
   apply = true,
   flip = true,
@@ -94,6 +104,7 @@ export async function positionElementAsync({
   shiftOptions,
   hide = false,
   hideOptions,
+  topLayer = false,
   transform = true,
   translateFunction = 'translate3d'
 }: IPositionElementConfig): Promise<IElementPositionResult> {
@@ -101,7 +112,11 @@ export async function positionElementAsync({
 
   // Order of the following middleware is **important**
   if (offset) {
-    middleware.push(positionOffsetMiddleware(offset));
+    if (typeof offset === 'object' && (offset.hasOwnProperty('x') || offset.hasOwnProperty('y'))) {
+      middleware.push(positionOffsetMiddleware(offset));
+    } else {
+      middleware.push(offsetMiddleware(offsetOptions));
+    }
   }
   if (shift) {
     middleware.push(shiftMiddleware(shiftOptions));
@@ -114,6 +129,9 @@ export async function positionElementAsync({
   }
   if (hide) {
     middleware.push(hideMiddleware(hideOptions));
+  }
+  if (topLayer) {
+    middleware.push(topLayerMiddleware());
   }
 
   const { x, y, middlewareData } = await computePosition(targetElement, element, { strategy, placement, middleware });
@@ -139,4 +157,13 @@ export async function positionElementAsync({
   }
 
   return { x, y, visibility };
+}
+
+/**
+ * Determines if the provided element is a child of a containment block.
+ * @param element The element to check.
+ * @returns {boolean} `true` if the element is within a containment block, otherwise `false`.
+ */
+export function isWithinContainingBlock(element: Element): boolean {
+  return Boolean(getContainingBlock(element));
 }
