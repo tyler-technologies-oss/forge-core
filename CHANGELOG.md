@@ -1,3 +1,23 @@
+# (Wed Feb 21 2024)
+
+#### 🐛 Bug Fix
+
+- fix: use github token ([@DRiFTy17](https://github.com/DRiFTy17))
+- fix: version calc error ([@DRiFTy17](https://github.com/DRiFTy17))
+- chore: update workflows [#12](https://github.com/tyler-technologies-oss/forge-core/pull/12) ([@DRiFTy17](https://github.com/DRiFTy17))
+- feat(component-utils): prefer `adoptedStyleSheets` if supported, fall back to `<style>` when unsupported while also allowing for `nonce` to be provided now [#11](https://github.com/tyler-technologies-oss/forge-core/pull/11) ([@DRiFTy17](https://github.com/DRiFTy17))
+
+#### ⚠️ Pushed to `main`
+
+- chore: roll back testing ([@DRiFTy17](https://github.com/DRiFTy17))
+- chore: show auto version details ([@DRiFTy17](https://github.com/DRiFTy17))
+
+#### Authors: 1
+
+- Kieran Nichols ([@DRiFTy17](https://github.com/DRiFTy17))
+
+---
+
 # v2.3.0 (Fri Aug 04 2023)
 
 #### 🚀 Enhancement
