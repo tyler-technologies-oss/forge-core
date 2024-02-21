@@ -5,6 +5,14 @@ declare global {
   interface Window {
     __forgeFlags__autoDefine: any;
   }
+
+  interface ShadowRoot {
+    adoptedStyleSheets: CSSStyleSheet[];
+  }
+  
+  interface CSSStyleSheet {
+    replaceSync(cssText: string): void;
+  }
 }
 
 export interface ICustomElementConfig {

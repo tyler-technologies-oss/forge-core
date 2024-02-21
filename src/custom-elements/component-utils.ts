@@ -1,5 +1,10 @@
 import { replaceElement, isArray, removeAllChildren, walkUpUntil } from '../utils';
 
+export const CUSTOM_ELEMENT_STYLES_PROPERTY = '_forgeElementStyles';
+
+/** Whether the browser supports constructable stylesheets */
+export const supportsConstructableStyleSheets = window.ShadowRoot && 'adoptedStyleSheets' in Document.prototype && 'replace' in CSSStyleSheet.prototype;
+
 /**
  * Recursively defines a component as a custom elements and all of its dependencies.
  * @param component The component to import.
@@ -94,11 +99,14 @@ export function attachLightTemplate<T extends HTMLElement>(componentInstance: T,
  * @param {string} elementName The name of the element the shadow root is to be attached to.
  * @param {string} template The shadow root template HTML string.
  * @param {string | string[]} styles The shadow root styles string to be encapsulated by this shadow root.
- * @param {boolean} [delegatesFocus=false] Should the component delagate focus.
+ * @param {boolean} [delegatesFocus=false] Should the component delegate focus.
  */
 export function attachShadowTemplate<T extends HTMLElement>(componentInstance: T, template: string, styles?: string | string[], delegatesFocus = false): void {
-  const templateElement = prepareShadowTemplate(template, styles);
+  const templateElement = prepareShadowTemplate(template);
   componentInstance.attachShadow({ mode: 'open', delegatesFocus });
+  if (styles) {
+    setShadowStyles(componentInstance, styles);
+  }
   setShadowTemplate(componentInstance, templateElement);
 }
 
@@ -114,10 +122,14 @@ export function replaceShadowTemplate<T extends HTMLElement>(componentInstance: 
     throw new Error('This element does not contain a shadow root. Did you mean to call `attachShadowTemplate`?');
   }
 
-  const templateElement = prepareShadowTemplate(template, styles);
+  const templateElement = prepareShadowTemplate(template);
 
   if ((componentInstance.shadowRoot as ShadowRoot).children.length) {
     removeAllChildren(componentInstance.shadowRoot as any);
+  }
+
+  if (styles) {
+    setShadowStyles(componentInstance, styles, { force: true });
   }
 
   setShadowTemplate(componentInstance, templateElement);
@@ -132,10 +144,16 @@ export function replaceShadowTemplate<T extends HTMLElement>(componentInstance: 
 export function prepareShadowTemplate(template: string, styles?: string | string[]): HTMLTemplateElement {
   const templateElement = parseTemplateString(template);
 
+  // Deprecated in favor of `setShadowStyles()`, leaving for backwards compatibility
+  // TODO: remove this in next major version, and remove `styles` argument above
   if (styles) {
     styles = styles instanceof Array ? styles : [styles];
     const styleElement = document.createElement('style');
-    styleElement.type = 'text/css';
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    const nonce = (window as any)['forgeNonce'];
+    if (nonce) {
+      styleElement.setAttribute('nonce', nonce);
+    }
     styleElement.textContent = styles.join(' ');
     templateElement.content.appendChild(styleElement);
   }
@@ -150,6 +168,48 @@ export function prepareShadowTemplate(template: string, styles?: string | string
  */
 export function setShadowTemplate<T extends HTMLElement>(componentInstance: T, templateElement: HTMLTemplateElement): void {
   (componentInstance.shadowRoot as ShadowRoot).appendChild(templateElement.content.cloneNode(true));
+}
+
+/**
+ * Applies styles to the shadow root of the provided element instance.
+ * @param {T} componentInstance A component instance.
+ * @param {string | string[]} styles The styles to be applied to the shadow root.
+ * @param options Options for setting the styles.
+ */
+export function setShadowStyles<T extends HTMLElement>(componentInstance: T, styles: string | string[], { force } = { force: false }): void {
+  const ctor = componentInstance.constructor;
+
+  if (!componentInstance.shadowRoot || !styles) {
+    if (supportsConstructableStyleSheets) {
+      if (ctor[CUSTOM_ELEMENT_STYLES_PROPERTY]) {
+        ctor[CUSTOM_ELEMENT_STYLES_PROPERTY] = [];
+      }
+      if (componentInstance.shadowRoot) {
+        componentInstance.shadowRoot.adoptedStyleSheets = [];
+      }
+    }
+    return;
+  }
+
+  styles = styles instanceof Array ? styles : [styles];
+
+  if (supportsConstructableStyleSheets) {
+    if (force || !ctor[CUSTOM_ELEMENT_STYLES_PROPERTY]) {
+      const sheet = new CSSStyleSheet();
+      sheet.replaceSync(styles.join(' '));
+      ctor[CUSTOM_ELEMENT_STYLES_PROPERTY] = [sheet];
+    }
+    componentInstance.shadowRoot.adoptedStyleSheets = ctor[CUSTOM_ELEMENT_STYLES_PROPERTY];
+  } else {
+    const styleElement = document.createElement('style');
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    const nonce = (window as any)['forgeNonce'];
+    if (nonce) {
+      styleElement.setAttribute('nonce', nonce);
+    }
+    styleElement.textContent = styles.join(' ');
+    componentInstance.shadowRoot.appendChild(styleElement);
+  }
 }
 
 /**
