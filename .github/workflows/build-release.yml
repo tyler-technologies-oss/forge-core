@@ -55,6 +55,10 @@ jobs:
         id: install
         run: npm ci
 
+      - name: Auto Version
+        id: auto-version
+        run: npx auto version --verbose
+
       ## Determine if this is a release build or not, which will affect which dependent jobs run below
       - name: Detect Release Status
         id: detect-release
@@ -63,7 +67,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.FORGE_NPM_TOKEN }}
         run: |
           ## We use `auto version` to calculate whether this is a release build or not
-          VERSION_RESULT=$(npx auto version --verbose)
+          VERSION_RESULT=$(npx auto version)
           echo "Version calculation result: ${VERSION_RESULT}"
           if [[ "${VERSION_RESULT}" =~ ^(major|minor|patch|release)$ ]]; then
             echo "Release: true"
