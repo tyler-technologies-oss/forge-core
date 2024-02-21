@@ -57,6 +57,8 @@ jobs:
 
       - name: Auto Version
         id: auto-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx auto version --verbose
 
       ## Determine if this is a release build or not, which will affect which dependent jobs run below
