@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Prepare Repository
         # Fetch full git history and tags
@@ -35,7 +35,7 @@ jobs:
 
       - name: Cache Dependencies
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -47,15 +47,12 @@ jobs:
             ${{ runner.os }}-
 
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "16"
 
       - name: Install
         id: install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.FORGE_NPM_TOKEN }}
         run: npm ci
 
       ## Determine if this is a release build or not, which will affect which dependent jobs run below
@@ -70,10 +67,10 @@ jobs:
           echo "Version calculation result: ${VERSION_RESULT}"
           if [[ "${VERSION_RESULT}" =~ ^(major|minor|patch|release)$ ]]; then
             echo "Release: true"
-            echo "::set-output name=release::true"
+            echo "release=true" >> $GITHUB_OUTPUT
           else
             echo "Release: false"
-            echo "::set-output name=release::false"
+            echo "release=false" >> $GITHUB_OUTPUT
           fi
 
       ## Detect if any specific files we care about have changed to help us know if we need to execute a CI build or Storybook deployment at all or not
@@ -100,7 +97,7 @@ jobs:
   build:
     name: Build and Test
     needs: wf-config
-    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-and-test.yml@v1.0.0
+    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-and-test.yml@v2.8.1
     if: ${{ needs.wf-config.outputs.is-release == 'false' && (needs.wf-config.outputs.build-files-changed == 'true' || needs.wf-config.outputs.test-files-changed == 'true') }}
     with:
       BUILD_ENABLED: ${{ needs.wf-config.outputs.build-files-changed == 'true' }}
@@ -112,7 +109,7 @@ jobs:
   build-and-release:
     name: Build and Release
     needs: wf-config
-    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-release.yml@v1.0.0
+    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-release.yml@v2.8.1
     if: ${{ needs.wf-config.outputs.is-release == 'true' }}
     with:
       PRODUCTION_RELEASE: true
