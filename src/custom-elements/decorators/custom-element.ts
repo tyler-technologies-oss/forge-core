@@ -1,9 +1,11 @@
 import { isFunction } from '../../utils';
 import { defineCustomElement } from '../component-utils';
+import { CUSTOM_ELEMENT_NAME_PROPERTY, CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY } from '../constants';
 
 declare global {
   interface Window {
-    __forgeFlags__autoDefine: any;
+    __forgeFlags__autoDefine: boolean;
+    __forgeFlags__useConstructableStylesheets: boolean;
   }
 
   interface ShadowRoot {
@@ -23,9 +25,6 @@ export interface ICustomElementConfig {
   /** Configures if the element will be automatically defined in the custom element registry. Default is `true` */
   define?: boolean;
 }
-
-export const CUSTOM_ELEMENT_NAME_PROPERTY = '_customElementName';
-export const CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY = '_customElementDependencies';
 
 /**
  * This decorator is intended to be used on classes that extend `HTMLElement` to
