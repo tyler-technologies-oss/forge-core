@@ -1,18 +1,20 @@
 import { replaceElement, isArray, removeAllChildren, walkUpUntil } from '../utils';
-
-export const CUSTOM_ELEMENT_STYLES_PROPERTY = '_forgeElementStyles';
-
-/** Whether the browser supports constructable stylesheets */
-export const supportsConstructableStyleSheets = window.ShadowRoot && 'adoptedStyleSheets' in Document.prototype && 'replace' in CSSStyleSheet.prototype;
+import {
+  CUSTOM_ELEMENT_CSS_PROPERTY,
+  CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY,
+  CUSTOM_ELEMENT_NAME_PROPERTY,
+  CUSTOM_ELEMENT_STYLESHEETS_PROPERTY,
+  supportsConstructableStyleSheets
+} from './constants';
 
 /**
  * Recursively defines a component as a custom elements and all of its dependencies.
  * @param component The component to import.
  */
 export function defineCustomElement(component: any): void {
-  tryDefine(component._customElementName, component);
-  if (isArray(component._customElementDependencies)) {
-    defineCustomElements(component._customElementDependencies);
+  tryDefine(component[CUSTOM_ELEMENT_NAME_PROPERTY], component);
+  if (isArray(component[CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY])) {
+    defineCustomElements(component[CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY]);
   }
 }
 
@@ -181,8 +183,8 @@ export function setShadowStyles<T extends HTMLElement>(componentInstance: T, sty
 
   if (!componentInstance.shadowRoot || !styles) {
     if (supportsConstructableStyleSheets) {
-      if (ctor[CUSTOM_ELEMENT_STYLES_PROPERTY]) {
-        ctor[CUSTOM_ELEMENT_STYLES_PROPERTY] = [];
+      if (ctor[CUSTOM_ELEMENT_STYLESHEETS_PROPERTY]) {
+        ctor[CUSTOM_ELEMENT_STYLESHEETS_PROPERTY] = [];
       }
       if (componentInstance.shadowRoot) {
         componentInstance.shadowRoot.adoptedStyleSheets = [];
@@ -194,12 +196,15 @@ export function setShadowStyles<T extends HTMLElement>(componentInstance: T, sty
   styles = styles instanceof Array ? styles : [styles];
 
   if (supportsConstructableStyleSheets) {
-    if (force || !ctor[CUSTOM_ELEMENT_STYLES_PROPERTY]) {
-      const sheet = new CSSStyleSheet();
-      sheet.replaceSync(styles.join(' '));
-      ctor[CUSTOM_ELEMENT_STYLES_PROPERTY] = [sheet];
+    if (force || !ctor[CUSTOM_ELEMENT_STYLESHEETS_PROPERTY]) {
+      const context = componentInstance.ownerDocument.defaultView ?? window;
+      const sheet = new context.CSSStyleSheet();
+      const cssText = styles.join(' ');
+      sheet.replaceSync(cssText);
+      ctor[CUSTOM_ELEMENT_CSS_PROPERTY] = cssText;
+      ctor[CUSTOM_ELEMENT_STYLESHEETS_PROPERTY] = [sheet];
     }
-    componentInstance.shadowRoot.adoptedStyleSheets = ctor[CUSTOM_ELEMENT_STYLES_PROPERTY];
+    componentInstance.shadowRoot.adoptedStyleSheets = ctor[CUSTOM_ELEMENT_STYLESHEETS_PROPERTY];
   } else {
     const styleElement = document.createElement('style');
     // eslint-disable-next-line @typescript-eslint/dot-notation
@@ -213,52 +218,23 @@ export function setShadowStyles<T extends HTMLElement>(componentInstance: T, sty
 }
 
 /**
- * Copies style rules from the provided document stylesheets collection to the provided shadow root stylesheet.
- * @param {Document} fromDocument The document to find the style sheets in.
- * @param {ShadowRoot} shadowRoot The shadow root that contains the stylesheet to copy the rules to.
- * @param {IStyleSheetDescriptor[]} styleSheetDescriptors A collection of style sheet predicates.
- * @param {CSSStyleSheet} shadowStyleSheet The shadow root stylesheet to copy the style rules to.
+ * Reapplies styles to the shadow root of the provided element instance. This function was
+ * intended to be called after an element has been adopted by a new document to reconstruct the
+ * adopted stylesheet instances within the context of the new document.
+ * 
+ * @param componentInstance The component instance to reapply styles to.
  */
-export function provideDocumentStyles(fromDocument: Document, shadowRoot: ShadowRoot, documentStyleSheets: Array<string | IStyleSheetDescriptor>, shadowStyleSheet: CSSStyleSheet): void {
-  if (!shadowStyleSheet) {
+export function readoptStyles<T extends HTMLElement>(componentInstance: T): void {
+  if (!supportsConstructableStyleSheets ||
+      !componentInstance.shadowRoot ||
+      !componentInstance.constructor[CUSTOM_ELEMENT_CSS_PROPERTY]) {
     return;
   }
-
-  const documentSheets: CSSStyleSheet[] = [];
-
-  documentStyleSheets.forEach(sheet => {
-    const sheetName = typeof sheet === 'string' ? sheet : sheet.name;
-    const sheetFilter = (sheet as IStyleSheetDescriptor).selectorFilter;
-    const matchingStyleSheet = _findMatchingStyleSheet(fromDocument.styleSheets, sheetName);
-
-    if (!matchingStyleSheet) {
-      throw new Error(`Could not find stylesheet: ${sheetName}`);
-    }
-
-    let startIndex = shadowStyleSheet.cssRules.length;
-    for (const rule in matchingStyleSheet.cssRules) {
-      if (matchingStyleSheet.cssRules.hasOwnProperty(rule) && matchingStyleSheet.cssRules[rule].cssText && (!sheetFilter || new RegExp(sheetFilter).test((matchingStyleSheet.cssRules[rule] as any).selectorText))) {
-        shadowStyleSheet.insertRule(matchingStyleSheet.cssRules[rule].cssText, startIndex++);
-      }
-    }
-  });
-}
-
-/**
- * Finds a stylesheet by name in the provided stylesheet list.
- * @param styleSheetList The stylesheet list to search.
- * @param sheetName The stylesheet name to find.
- * @returns {CSSStyleSheet | undefined}
- */
-function _findMatchingStyleSheet(styleSheetList: StyleSheetList, sheetName: string): CSSStyleSheet | undefined {
-  for (const prop in styleSheetList) {
-    if (styleSheetList.hasOwnProperty(prop) && styleSheetList[prop].href) {
-      if (new RegExp(sheetName).test(styleSheetList[prop].href as string)) {
-        return styleSheetList[prop] as CSSStyleSheet;
-      }
-    }
-  }
-  return undefined;
+  const cssText = componentInstance.constructor[CUSTOM_ELEMENT_CSS_PROPERTY];
+  const context = componentInstance.ownerDocument.defaultView ?? window;
+  const sheet = new context.CSSStyleSheet();
+  sheet.replaceSync(cssText);
+  componentInstance.shadowRoot.adoptedStyleSheets = [sheet];
 }
 
 /**
@@ -353,9 +329,4 @@ export function closestElement(selector: string, startElement: Element): Element
     return found || __closestFrom(((el as Element).getRootNode() as ShadowRoot).host);
   }
   return __closestFrom(startElement);
-}
-
-export interface IStyleSheetDescriptor {
-  name: string;
-  selectorFilter?: string;
 }
