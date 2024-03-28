@@ -230,10 +230,10 @@ export function readoptStyles<T extends HTMLElement>(componentInstance: T): void
       !componentInstance.constructor[CUSTOM_ELEMENT_CSS_PROPERTY]) {
     return;
   }
-  const css = componentInstance.constructor[CUSTOM_ELEMENT_CSS_PROPERTY];
+  const cssText = componentInstance.constructor[CUSTOM_ELEMENT_CSS_PROPERTY];
   const context = componentInstance.ownerDocument.defaultView ?? window;
   const sheet = new context.CSSStyleSheet();
-  sheet.replaceSync(css);
+  sheet.replaceSync(cssText);
   componentInstance.shadowRoot.adoptedStyleSheets = [sheet];
 }
 
