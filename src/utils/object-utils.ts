@@ -56,7 +56,7 @@ export function createPredicate(key: string[], data: any): any {
   }
 
   const predicate: any = {};
-  
+
   for (const propertyName of key) {
     if (Object.prototype.hasOwnProperty.call(data, propertyName)) {
       predicate[propertyName] = data[propertyName];
@@ -107,6 +107,63 @@ export function listenOwnProperty(context: any, obj: any, prop: string, listener
       listener.apply(context, arguments);
     }
   });
-  
+
   return () => Object.defineProperty(obj, prop, originalValueDescriptor);
 }
+
+
+/**
+ * Recursively searches for a value within an object, optionally limited to keys names present in the limitProps string array.
+ * @param value The value to search for.
+ * @param target The object to search through.
+ * @param limitProps An optional string array of property name to limit the search to.
+ * @returns A boolean value indicating if the value exists within the object (limited to limitProps keys if given) regardless of depth.
+ */
+export function deepSearchByValuePredicate(value: string, target: { [key: string]: any }, limitProps: string[] = []): boolean {
+  value = value.toLowerCase();
+  let result = false;
+  for (const k in target) {
+    if (limitProps?.length > 0) {
+      const found = Object.keys(target).filter(element => limitProps.includes(element));
+      if (found.includes(k)) {
+        const filteredObj = Object.fromEntries(Object.entries(target).filter(([key]) => limitProps.includes(key)));
+        result = result ? result : deepValueExistsPredicate(value, Object.values(filteredObj));
+      }
+      if (target[k] && typeof target[k] === 'object') {
+        result = result ? result : deepSearchByValuePredicate(value, target[k], limitProps);
+      }
+    } else {
+      if (target[k] && (typeof target[k] === 'string' || typeof target[k] === 'number' || Array.isArray(target[k]))) {
+        result = result ? result : deepValueExistsPredicate(value, target[k]);
+      }
+      if (target[k] && typeof target[k] === 'object') {
+        result = result ? result : deepSearchByValuePredicate(value, target[k], limitProps);
+      }
+    }
+  }
+  return result;
+}
+
+/**
+ * Tests for a value present in a number, string or arrays of either type.
+ * @param value The value to search for.
+ * @param target The string/number/array to search against.
+ * @returns A boolean value indicating if the value exists within the target.
+ */
+export function deepValueExistsPredicate(
+  value: string,
+  target: string | number | Array<string> | Array<number>
+): boolean {
+  value = value.toLocaleLowerCase();
+  if (typeof target === 'string') {
+    return target.toLowerCase().includes(value);
+  }
+  if (typeof target === 'number') {
+    return target.toString().includes(value);
+  }
+  if (Array.isArray(target)) {
+    return target.some(y => deepValueExistsPredicate(value, y));
+  }
+  return false;
+}
+
