@@ -94,10 +94,10 @@ export abstract class MediaObserver<T> extends Subject<T> {
     return CustomMediaObserver.create(query, options);
   }
 
-  private static _getObserver<T extends MediaObserver<U>, U>(name: string): T | undefined {
+  private static _getObserver<TObserver extends MediaObserver<U>, U>(name: string): TObserver | undefined {
     const existing = MediaObserver._observers[name];
     if (existing) {
-      return existing as T;
+      return existing as TObserver;
     }
     return undefined;
   }

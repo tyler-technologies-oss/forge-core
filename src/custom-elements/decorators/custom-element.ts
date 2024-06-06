@@ -1,4 +1,3 @@
-import { isFunction } from '../../utils';
 import { defineCustomElement } from '../component-utils';
 import { CUSTOM_ELEMENT_NAME_PROPERTY, CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY } from '../constants';
 
@@ -31,7 +30,7 @@ export interface ICustomElementConfig {
  * extend/modify the behavior of a custom element.
  * @param {ICustomElementConfig} [config={}] The custom element configuration.
  */
-export function CustomElement({ name, dependencies, define = true }: ICustomElementConfig): any {
+export function customElement({ name, dependencies, define = true }: ICustomElementConfig): any {
   return (ctor: HTMLElement) => {
     patchConnectedCallback(ctor);
 
@@ -57,12 +56,12 @@ function patchConnectedCallback(ctor: any): void {
     }
     if (!this._isInitialized) {
       tryUpgradeOwnProperties(this);
-      if (isFunction(this.initializedCallback)) {
+      if (typeof this.initializedCallback === 'function') {
         this.initializedCallback.apply(this);
       }
       this._isInitialized = true;
     }
-    if (isFunction(originalConnectedCallback)) {
+    if (typeof originalConnectedCallback === 'function') {
       originalConnectedCallback.apply(this);
     }
   };
@@ -71,8 +70,7 @@ function patchConnectedCallback(ctor: any): void {
 function tryUpgradeOwnProperties(instance: any): void {
   // We ignore our properties that start with an underscore as those are considered "internal"
   // and are not auto-upgraded for us
-  const ownProperties = Object.getOwnPropertyNames(instance)
-    .filter(p => !p.startsWith('_'));
+  const ownProperties = Object.getOwnPropertyNames(instance).filter(p => !p.startsWith('_'));
   for (const property of ownProperties) {
     const value = instance[property];
     delete instance[property];

@@ -1,4 +1,5 @@
-import { ItemManager } from '@tylertech/forge-core/utils';
+import { expect } from '@esm-bundle/chai';
+import { ItemManager } from '../src';
 
 interface ITestOption {
   Id: number;
@@ -14,8 +15,8 @@ describe('ItemManager', () => {
     const manager = new ItemManager<ITestOption>(['Id']);
     manager.add(defaultOption);
     manager.clear();
-    expect(manager.exists(defaultOption)).toBe(false);
-    expect(manager.count()).toBe(0);
+    expect(manager.exists(defaultOption)).to.equal(false);
+    expect(manager.count()).to.equal(0);
   });
 
   describe('using complex types', () => {
@@ -27,63 +28,63 @@ describe('ItemManager', () => {
       });
 
       it('should have no items by default', () => {
-        expect(manager.count()).toBe(0);
+        expect(manager.count()).to.equal(0);
       });
 
       it('should add single value', () => {      
         manager.add(defaultOption);
-        expect(manager.count()).toBe(1);
-        expect(manager.getItems()[0]).toBe(defaultOption);
+        expect(manager.count()).to.equal(1);
+        expect(manager.getItems()[0]).to.equal(defaultOption);
       });
 
       it('should add multiple values', () => {
         const secondOption = { Id: 2, Name: 'Julian Edelman',  Age: 31 };
         manager.add(defaultOption);
         manager.add(secondOption);
-        expect(manager.count()).toBe(2);
-        expect(manager.getItems()[0]).toBe(defaultOption);
-        expect(manager.getItems()[1]).toBe(secondOption);
+        expect(manager.count()).to.equal(2);
+        expect(manager.getItems()[0]).to.equal(defaultOption);
+        expect(manager.getItems()[1]).to.equal(secondOption);
       });
 
       it('should not add duplicate values', () => {
         const secondOption = { Id: 1, Name: 'Julian Edelman',  Age: 31 };
         manager.add(defaultOption);
         manager.add(secondOption);
-        expect(manager.count()).toBe(1);
-        expect(manager.getItems()[0]).toBe(defaultOption);
+        expect(manager.count()).to.equal(1);
+        expect(manager.getItems()[0]).to.equal(defaultOption);
       });
 
       it('should remove single value', () => {
         manager.add(defaultOption);
         manager.remove(defaultOption);
-        expect(manager.count()).toBe(0);
+        expect(manager.count()).to.equal(0);
       });
 
       it('should remove multiple values', () => {
         const secondOption = { Id: 2, Name: 'Julian Edelman',  Age: 31 };
         manager.add(defaultOption);
         manager.add(secondOption);
-        expect(manager.count()).toBe(2);
+        expect(manager.count()).to.equal(2);
         manager.remove(manager.getItems());
-        expect(manager.count()).toBe(0);
+        expect(manager.count()).to.equal(0);
       });
 
       it('should remove matching value of different instance', () => {
         manager.add(defaultOption);
         manager.remove(JSON.parse(JSON.stringify(defaultOption)));
-        expect(manager.count()).toBe(0);
+        expect(manager.count()).to.equal(0);
       });
 
       it('should allow changing key', () => {
         manager.setKey(['Age']);
         manager.add(defaultOption);
-        expect(manager.count()).toBe(1);
+        expect(manager.count()).to.equal(1);
       });
 
       it('should recognize existing items after changing key', () => {
         manager.add(defaultOption);
         manager.setKey(['Age']);
-        expect(manager.exists(defaultOption)).toBe(true);
+        expect(manager.exists(defaultOption)).to.equal(true);
       });
     });
 
@@ -97,13 +98,13 @@ describe('ItemManager', () => {
       it('should allow duplicate objects of different reference but same structure', () => {
         manager.add(defaultOption);
         manager.add(JSON.parse(JSON.stringify(defaultOption)));
-        expect(manager.count()).toBe(2);
+        expect(manager.count()).to.equal(2);
       });
 
       it('should do nothing if object is not in the items list when removing', () => {
         manager.add(defaultOption);
         manager.remove({ Id: 74, Name: 'Some Random Object', Age: 1 });
-        expect(manager.count()).toBe(1);
+        expect(manager.count()).to.equal(1);
       });
     });
   });
@@ -117,33 +118,33 @@ describe('ItemManager', () => {
 
     it('should add single primitive value', () => {
       manager.add('1');
-      expect(manager.count()).toBe(1);
-      expect(manager.getItems()[0]).toBe('1');
+      expect(manager.count()).to.equal(1);
+      expect(manager.getItems()[0]).to.equal('1');
     });
 
     it('should add multiple primitive values', () => {
       manager.add(['1', '2']);
-      expect(manager.count()).toBe(2);
-      expect(manager.getItems().indexOf('1') !== -1).toBe(true);
-      expect(manager.getItems().indexOf('2') !== -1).toBe(true);
+      expect(manager.count()).to.equal(2);
+      expect(manager.getItems().indexOf('1') !== -1).to.equal(true);
+      expect(manager.getItems().indexOf('2') !== -1).to.equal(true);
     });
 
     it('should not add duplicate primitive values', () => {
       manager.add(['1', '1']);
-      expect(manager.count()).toBe(1);
-      expect(manager.getItems().indexOf('1') !== -1).toBe(true);
+      expect(manager.count()).to.equal(1);
+      expect(manager.getItems().indexOf('1') !== -1).to.equal(true);
     });
 
     it('should remove primitive value', () => {
       manager.add('1');
       manager.remove('1');
-      expect(manager.count()).toBe(0);
+      expect(manager.count()).to.equal(0);
     });
 
     it('should have no side-effects if primitive value doesn\'t exist in items when removing', () => {
       manager.add('1');
       manager.remove('2');
-      expect(manager.count()).toBe(1);
+      expect(manager.count()).to.equal(1);
     });
   });
 });

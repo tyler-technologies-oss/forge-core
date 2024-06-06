@@ -12,7 +12,7 @@ const daysLong = [
   'Sunday',
   'Monday',
   'Tuesday',
-  'Wedensday',
+  'Wednesday',
   'Thursday',
   'Friday',
   'Saturday'

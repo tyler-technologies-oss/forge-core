@@ -1,66 +1,73 @@
 interface IComponent extends HTMLElement {
-  _foundation?: { [key: string]: any } | undefined;
+  [CORE_PROPERTY_NAME]?: { [key: string]: any } | undefined;
 }
 
-export interface IFoundationPropertyOptions<T> {
+export interface ICorePropertyOptions {
   /**
-   * Allow Binding to a different naming convention in the foundation
-   * @example FoundationProperty({name: '_foo'}) foo;
+   * Allow Binding to a different naming convention in the core
+   * @example coreProperty({name: '_foo'}) foo;
    */
   name?: string;
 
   /**
-   * When false, skips calling the foundation property setter
+   * When false, skips calling the core property setter
    * @default true
-   * @example FoundationProperty({set: true}) foo;
+   * @example coreProperty({set: true}) foo;
    */
   set?: boolean;
 
   /**
-   * When false, skips calling the foundation property getter
+   * When false, skips calling the core property getter
    * @default true
-   * @example FoundationProperty({get: true}) foo;
+   * @example coreProperty({get: true}) foo;
    */
   get?: boolean;
 }
 
-class FoundationPropertyOptions<T> implements IFoundationPropertyOptions<T> {
+class CorePropertyOptions implements ICorePropertyOptions {
   public name: string;
   public get = true;
   public set = true;
 
-  constructor(options?: IFoundationPropertyOptions<T>) {
+  constructor(options?: ICorePropertyOptions) {
     if (options) {
       Object.assign(this, options);
     }
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const foundationPropertyNotFoundMessage = (className: string, propertyName: string) => `${className}\'s foundation does not contain the property \"${propertyName}\"`;
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const foundationNotFoundMessage = (className: string) => `${className} does not have a foundation`;
+const CORE_PROPERTY_NAME = '_core';
+
+const corePropertyNotFoundMessage = (className: string, propertyName: string): string => `${className}\'s core does not contain the property \"${propertyName}\"`;
+const coreNotFoundMessage = (className: string): string => `${className} does not have a core`;
 
 function runIfVerified(target: IComponent, propertyName: string, action: () => any | void): any {
-  if (target._foundation) {
-    if (propertyName in target._foundation) {
+  if (target[CORE_PROPERTY_NAME]) {
+    if (propertyName in target[CORE_PROPERTY_NAME]) {
       return action();
     } else {
-      throw new Error(foundationPropertyNotFoundMessage(target.localName, propertyName));
+      throw new Error(corePropertyNotFoundMessage(target.localName, propertyName));
     }
   } else {
-    throw new Error(foundationNotFoundMessage(target.localName));
+    throw new Error(coreNotFoundMessage(target.localName));
   }
 }
 
-export function FoundationProperty<T>(options?: IFoundationPropertyOptions<T>): any {
-  const allOptions = new FoundationPropertyOptions(options);
+/**
+ * This decorator is intended to be used on properties of a class that extends `HTMLElement` to dynamically
+ * create getters and setters that interact with the `_core` member of the class.
+ * 
+ * @param options The core property options.
+ * @returns
+ */
+export function coreProperty(options?: ICorePropertyOptions): any {
+  const allOptions = new CorePropertyOptions(options);
 
   return (target: IComponent, name: string | symbol, descriptor: PropertyDescriptor | undefined) => {
     let defaultGet: (() => any) | undefined;
     let defaultSet: ((v: any) => void) | undefined;
     const propertyName: string | symbol = name;
-    const foundationPropertyName = ((options && options.name) || name).toString();
+    const corePropertyName = ((options && options.name) || name).toString();
 
     if (descriptor) {
       defaultGet = descriptor.get;
@@ -71,9 +78,9 @@ export function FoundationProperty<T>(options?: IFoundationPropertyOptions<T>): 
         descriptor.set = function(value: any) {
           return wireDescriptorSet(
             this,
-            foundationPropertyName,
+            corePropertyName,
             attributes => {
-              const desc = Object.getOwnPropertyDescriptor(target, foundationPropertyName) as PropertyDescriptor;
+              const desc = Object.getOwnPropertyDescriptor(target, corePropertyName) as PropertyDescriptor;
               desc.set = attributes.set;
               Reflect.defineProperty(target, propertyName, desc);
               attributes.set(value);
@@ -86,9 +93,9 @@ export function FoundationProperty<T>(options?: IFoundationPropertyOptions<T>): 
         descriptor.get = function() {
           return wireDescriptorGet(
             this,
-            foundationPropertyName,
+            corePropertyName,
             attributes => {
-              const desc = Object.getOwnPropertyDescriptor(target, foundationPropertyName) as PropertyDescriptor;
+              const desc = Object.getOwnPropertyDescriptor(target, corePropertyName) as PropertyDescriptor;
               desc.get = attributes.get;
               Reflect.defineProperty(target, propertyName, desc);
               return attributes.get();
@@ -104,15 +111,12 @@ export function FoundationProperty<T>(options?: IFoundationPropertyOptions<T>): 
         const get = {
           get() {
             const that = this;
-            return wireDescriptorGet(that, foundationPropertyName, attrs => {
+            return wireDescriptorGet(that, corePropertyName, attrs => {
               let setter: any;
-
-              // We have to wire the setter here as well
               if (allOptions.set) {
                 setter = { ...set };
               }
-
-              Reflect.defineProperty(that, foundationPropertyName, { configurable: true, enumerable: true, ...attrs, ...setter });
+              Reflect.defineProperty(that, corePropertyName, { configurable: true, enumerable: true, ...attrs, ...setter });
               return attrs.get();
             });
           }
@@ -121,13 +125,12 @@ export function FoundationProperty<T>(options?: IFoundationPropertyOptions<T>): 
         const set = {
           set(value: any) {
             const that = this;
-            return wireDescriptorSet(that, foundationPropertyName, attrs => {
+            return wireDescriptorSet(that, corePropertyName, attrs => {
               let getter: any;
-              // We have to wire the getter here as well
               if (allOptions.get) {
                 getter = { ...get };
               }
-              Reflect.defineProperty(that, foundationPropertyName, { configurable: true, enumerable: true, ...attrs, ...getter });
+              Reflect.defineProperty(that, corePropertyName, { configurable: true, enumerable: true, ...attrs, ...getter });
               attrs.set(value);
             });
           }
@@ -147,14 +150,14 @@ export function FoundationProperty<T>(options?: IFoundationPropertyOptions<T>): 
   };
 }
 
-function setFoundation(target: IComponent, value: any, propertyName: string): void {
+function setCoreProperty(target: IComponent, value: any, propertyName: string): void {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  target._foundation![propertyName] = value;
+  target[CORE_PROPERTY_NAME]![propertyName] = value;
 }
 
-function getFoundation(target: IComponent, propertyName: string): any {
+function getCoreProperty(target: IComponent, propertyName: string): any {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return target._foundation![propertyName];
+  return target[CORE_PROPERTY_NAME]![propertyName];
 }
 
 function wireDescriptorSet(target: IComponent, propertyName: string, wireAction: (attributes: { set: (value: any) => void }) => void | any, defaultSet?: (value: any) => void): any {
@@ -164,13 +167,13 @@ function wireDescriptorSet(target: IComponent, propertyName: string, wireAction:
     attributes = {
       set(value: any) {
         defaultSet.call(target, value);
-        setFoundation(target, value, propertyName);
+        setCoreProperty(target, value, propertyName);
       }
     };
   } else {
     attributes = {
       set(value: any) {
-        setFoundation(target, value, propertyName);
+        setCoreProperty(target, value, propertyName);
       }
     };
   }
@@ -185,13 +188,13 @@ function wireDescriptorGet(target: IComponent, propertyName: string, wireAction:
     attributes = {
       get() {
         defaultGet.call(target);
-        return getFoundation(target, propertyName);
+        return getCoreProperty(target, propertyName);
       }
     };
   } else {
     attributes = {
       get() {
-        return getFoundation(target, propertyName);
+        return getCoreProperty(target, propertyName);
       }
     };
   }

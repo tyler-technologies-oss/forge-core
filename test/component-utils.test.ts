@@ -1,5 +1,5 @@
-import { getClosestShadowRoot } from '@tylertech/forge-core/custom-elements/component-utils';
-import { removeElement } from '@tylertech/forge-core/utils/dom-utils';
+import { expect } from '@esm-bundle/chai';
+import { getClosestShadowRoot } from '../src';
 
 describe('ComponentUtils', () => {
   describe('getClosestShadowRoot', () => {
@@ -20,23 +20,23 @@ describe('ComponentUtils', () => {
     });
 
     afterEach(() => {
-      removeElement(lightElement);
-      removeElement(shadowElement);
+      lightElement.remove();
+      shadowElement.remove();
     });
 
     it('should return null if not inside a shadow root', () => {
-      expect(getClosestShadowRoot(lightElement)).toBeNull();
+      expect(getClosestShadowRoot(lightElement)).to.be.null;
     });
 
     it('should not return null if inside a shadow root', () => {
       const node = getClosestShadowRoot(shadowElement);
-      expect(node).not.toBeNull();
-      expect(node).toBe(shadowRoot);
+      expect(node).not.to.be.null;
+      expect(node).to.equal(shadowRoot);
     });
 
     it('should find shadow root if nested', () => {
       const node = getClosestShadowRoot(nestedShadowElement);
-      expect(node).toBe(shadowRoot);
+      expect(node).to.equal(shadowRoot);
     });
   });
 });
