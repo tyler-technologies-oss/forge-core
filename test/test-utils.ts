@@ -1,4 +1,3 @@
-
 /**
  * Converts requestAnimationFrame to a promise.
  */

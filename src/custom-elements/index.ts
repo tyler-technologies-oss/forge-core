@@ -10,7 +10,7 @@ export interface ICustomElement extends HTMLElement {
   adoptedCallback?: () => void;
 }
 
-export interface ICustomElementFoundation {
+export interface ICustomElementCore {
   initialize?: () => void;
   connect?: () => void;
   disconnect?: () => void;

@@ -1,3 +1,3 @@
 export * from './custom-element';
-export * from './foundation-property';
+export * from './core-property';
 

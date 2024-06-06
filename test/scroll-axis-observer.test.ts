@@ -1,5 +1,5 @@
-import { ScrollAxisObserver, ScrollEvents, IScrollAxisObserver } from '@tylertech/forge-core/scroll';
-import { tick } from './test-utils';
+import { expect } from '@esm-bundle/chai';
+import { ScrollAxisObserver, ScrollEvents, IScrollAxisObserver } from '../src';
 
 describe('ScrollAxisObserver', () => {
   let container: HTMLElement;
@@ -27,7 +27,7 @@ describe('ScrollAxisObserver', () => {
   });
 
   it('should throw if no element is provided', () => {
-    expect(() => new ScrollAxisObserver(undefined as any)).toThrow();
+    expect(() => new ScrollAxisObserver(undefined as any)).to.throw();
   });
 
   // it('should emit scroll event', async () => {
