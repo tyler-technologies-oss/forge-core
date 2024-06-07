@@ -3,7 +3,7 @@ import { CUSTOM_ELEMENT_NAME_PROPERTY, CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY } fr
 
 declare global {
   interface Window {
-    __forgeFlags__autoDefine: boolean | undefined;
+    __forgeFlags__autoDefine: any;
     __forgeFlags__useConstructableStyleSheets: boolean | undefined;
   }
 
