@@ -1,3 +1,31 @@
+# v3.0.0 (Mon Jun 10 2024)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Alex Oxthorn ([@Alex-Oxthorn](https://github.com/Alex-Oxthorn)), for all your work!
+
+#### 💥 Breaking Change
+
+- feat: initial 3.0 GA release [#17](https://github.com/tyler-technologies-oss/forge-core/pull/17) ([@DRiFTy17](https://github.com/DRiFTy17))
+
+#### 🚀 Enhancement
+
+- feat(custom-elements): add new `readoptStyles()` helper and adjust how CSS is applied to shadow roots [#14](https://github.com/tyler-technologies-oss/forge-core/pull/14) ([@DRiFTy17](https://github.com/DRiFTy17))
+- feat(deepSearchByValuePredicate): adds deepSearchByValuePredicate object util function [#8](https://github.com/tyler-technologies-oss/forge-core/pull/8) ([@Alex-Oxthorn](https://github.com/Alex-Oxthorn))
+
+#### 🐛 Bug Fix
+
+- fix: don't create version branch ([@DRiFTy17](https://github.com/DRiFTy17))
+- fix: trigger release workflow ([@DRiFTy17](https://github.com/DRiFTy17))
+- fix: upgrade auto to fix release failure [#13](https://github.com/tyler-technologies-oss/forge-core/pull/13) ([@DRiFTy17](https://github.com/DRiFTy17))
+
+#### Authors: 2
+
+- Alex Oxthorn ([@Alex-Oxthorn](https://github.com/Alex-Oxthorn))
+- Kieran Nichols ([@DRiFTy17](https://github.com/DRiFTy17))
+
+---
+
 # (Wed Feb 21 2024)
 
 #### 🐛 Bug Fix
