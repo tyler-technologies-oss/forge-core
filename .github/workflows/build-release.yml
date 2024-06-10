@@ -1,7 +1,3 @@
-## We only run this workflow on pushes to the main branch. This workflow will
-## first determine if a release is to be published, and if so, build and publish.
-## Otherwise, if not a release, we just perform CI build validation.
-
 name: Build and Release
 
 on:
@@ -11,8 +7,7 @@ on:
     paths:
       - '.github/workflows/**/*'
       - '.eslintrc.json'
-      - 'auto.config.ts'
-      - 'gulpfile.ts'
+      - '.autorc'
       - 'tsconfig.json'
       - 'spec/**/*'
       - 'src/**/*'
@@ -27,15 +22,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Prepare Repository
-        # Fetch full git history and tags
         run: git fetch --unshallow --tags
 
       - name: Cache Dependencies
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -47,9 +41,9 @@ jobs:
             ${{ runner.os }}-
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version: "20"
 
       - name: Install
         id: install
@@ -65,7 +59,7 @@ jobs:
           ## We use `auto version` to calculate whether this is a release build or not
           VERSION_RESULT=$(npx auto version)
           echo "Version calculation result: ${VERSION_RESULT}"
-          if [[ "${VERSION_RESULT}" =~ ^(major|minor|patch|release)$ ]]; then
+          if [[ "${VERSION_RESULT}" =~ ^(premajor|preminor|prepatch)$ ]]; then
             echo "Release: true"
             echo "release=true" >> $GITHUB_OUTPUT
           else
@@ -75,14 +69,13 @@ jobs:
 
       ## Detect if any specific files we care about have changed to help us know if we need to execute a CI build or Storybook deployment at all or not
       - name: Check File Changes
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v3
         id: file-filter
         with:
           filters: |
             build:
               - '.github/workflows/**'
               - '.eslintrc.json'
-              - 'gulpfile.ts'
               - 'tsconfig.json'
               - 'src/**'
             test:
@@ -97,7 +90,7 @@ jobs:
   build:
     name: Build and Test
     needs: wf-config
-    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-and-test.yml@v2.8.1
+    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-and-test.yml@v2.10.3
     if: ${{ needs.wf-config.outputs.is-release == 'false' && (needs.wf-config.outputs.build-files-changed == 'true' || needs.wf-config.outputs.test-files-changed == 'true') }}
     with:
       BUILD_ENABLED: ${{ needs.wf-config.outputs.build-files-changed == 'true' }}
@@ -109,7 +102,7 @@ jobs:
   build-and-release:
     name: Build and Release
     needs: wf-config
-    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-release.yml@v2.8.1
+    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-release.yml@v2.10.3
     if: ${{ needs.wf-config.outputs.is-release == 'true' }}
     with:
       PRODUCTION_RELEASE: true

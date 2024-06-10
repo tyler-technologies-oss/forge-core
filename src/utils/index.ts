@@ -6,6 +6,5 @@ export * from './http-utils';
 export * from './item-manager';
 export * from './object-utils';
 export * from './platform';
-export * from './position-utils';
 export * from './string-utils';
 export * from './utils';

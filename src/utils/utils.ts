@@ -191,7 +191,7 @@ export function debounce(func: any, wait: number, immediate: boolean = false): (
  * @param {number} wait The amount of time (milliseconds) to wait.
  * @param {object=} options An options object with the following properties
  *   <ul>
- *     <li>**leading**: Should the callback be executed once immeadiately.</li>
+ *     <li>**leading**: Should the callback be executed once immediately.</li>
  *     <li>**trailing**: Should the callback be executed once after the throttle completes.</li>
  *   </ul>
  */

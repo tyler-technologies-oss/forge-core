@@ -2,9 +2,9 @@
   "root": true,
   "ignorePatterns": [
     "dist/**/*",
-    "spec/**/*",
-    "tools/**/*",
-    "karma.conf.js"
+    "test/**/*",
+    "web-test-runner.config.mjs",
+    "commitlint.config.js"
   ],
   "overrides": [
     {

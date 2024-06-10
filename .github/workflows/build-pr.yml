@@ -2,18 +2,11 @@ name: Build Pull Request
 
 on:
   pull_request:
-    paths:
-      - '.github/workflows/**/*'
-      - '.eslintrc.json'
-      - 'gulpfile.ts'
-      - 'tsconfig.json'
-      - 'spec/**/*'
-      - 'src/**/*'
 
 jobs:
   build:
     name: Build and Test
-    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-and-test.yml@v2.8.1
+    uses: tyler-technologies-oss/forge-automation-shared/.github/workflows/wf-build-and-test.yml@v2.10.3
     with:
       TESTS_ENABLED: true
     secrets:
