@@ -1,13 +1,9 @@
-## We only run this workflow on pushes to the main branch. This workflow will
-## first determine if a release is to be published, and if so, build and publish.
-## Otherwise, if not a release, we just perform CI build validation.
-
 name: Build and Release
 
 on:
   push:
     branches:
-      - main
+      - version-2
     paths:
       - '.github/workflows/**/*'
       - '.eslintrc.json'
