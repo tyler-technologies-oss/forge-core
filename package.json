@@ -19,9 +19,6 @@
   "files": [
     "dist"
   ],
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "prepare": "husky",
     "build": "npm run lint && rimraf ./dist && tsc",
