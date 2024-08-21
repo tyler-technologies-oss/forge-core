@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { ItemManager } from '../src';
+import { ItemManager } from '../src/utils/item-manager';
 
 interface ITestOption {
   Id: number;

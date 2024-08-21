@@ -1,6 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 import { spy } from 'sinon';
-import { coreProperty } from '../src';
+import { coreProperty } from '../src/custom-elements/decorators/core-property';
 
 const BEFORE_CORE_SET = 'before-core-set';
 

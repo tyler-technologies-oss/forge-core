@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import * as Utils from '../src';
+import * as Utils from '../src/utils/utils';
 
 describe('Utils', () => {
   describe('randomChars', () => {
