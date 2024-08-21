@@ -4,7 +4,7 @@
     "dist/**/*",
     "test/**/*",
     "web-test-runner.config.mjs",
-    "commitlint.config.js"
+    "commitlint.config.mjs"
   ],
   "overrides": [
     {
