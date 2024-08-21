@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { MessageList } from '../src';
+import { MessageList } from '../src/message-list/message-list';
 
 describe('MessageList', () => {
   it('should be instantiated with correct default values', () => {

@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { getClosestShadowRoot } from '../src';
+import { getClosestShadowRoot } from '../src/custom-elements/component-utils';
 
 describe('ComponentUtils', () => {
   describe('getClosestShadowRoot', () => {

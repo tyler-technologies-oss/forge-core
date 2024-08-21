@@ -1,6 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 import { spy } from 'sinon';
-import { listenOwnProperty, deepValueExistsPredicate, deepSearchByValuePredicate } from '@tylertech/forge-core';
+import { listenOwnProperty, deepValueExistsPredicate, deepSearchByValuePredicate } from '../src/utils/object-utils';
 
 describe('object-utils', () => {
   describe('listenOwnProperty', () => {

@@ -1,6 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 import { spy } from 'sinon';
-import * as DOMUtils from '../src';
+import * as DOMUtils from '../src/utils/dom-utils';
 import { tick, timer } from './test-utils';
 
 describe('DOMUtils', () => {

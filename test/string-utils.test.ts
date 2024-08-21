@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { dashify } from '../src';
+import { dashify } from '../src/utils/string-utils';
 
 describe('StringUtils', () => {
   describe('dashify', () => {

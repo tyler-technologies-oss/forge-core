@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { ScrollAxisObserver, ScrollEvents, IScrollAxisObserver } from '../src';
+import { ScrollAxisObserver, IScrollAxisObserver } from '../src/scroll/scroll-axis-observer';
 
 describe('ScrollAxisObserver', () => {
   let container: HTMLElement;

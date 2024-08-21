@@ -1,6 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 import { spy } from 'sinon';
-import { ForgeResizeObserver } from '../src';
+import { ForgeResizeObserver } from '../src/resize/resize-observer';
 
 describe('ForgeResizeObserver', () => {
   let element: Element;

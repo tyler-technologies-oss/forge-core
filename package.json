@@ -8,14 +8,9 @@
     "type": "git",
     "url": "git+https://github.com/tyler-technologies-oss/forge-core.git"
   },
-  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "typings": "./dist/index.d.ts",
-  "exports": {
-    "package": "./package.json",
-    "import": "./dist/index.js"
-  },
   "files": [
     "dist"
   ],
