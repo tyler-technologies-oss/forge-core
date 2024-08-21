@@ -1,3 +1,21 @@
+# v3.0.1 (Wed Aug 21 2024)
+
+#### 🐛 Bug Fix
+
+- fix: revert package exports and type for legacy tooling compatibility and remove invalid sourcemaps [#19](https://github.com/tyler-technologies-oss/forge-core/pull/19) ([@DRiFTy17](https://github.com/DRiFTy17))
+- fix: remove node engine from package.json [#18](https://github.com/tyler-technologies-oss/forge-core/pull/18) ([@DRiFTy17](https://github.com/DRiFTy17))
+
+#### ⚠️ Pushed to `main`
+
+- chore: allow `package.json` changes to trigger build ([@DRiFTy17](https://github.com/DRiFTy17))
+- Merge branch 'main' of https://github.com/tyler-technologies-oss/forge-core ([@DRiFTy17](https://github.com/DRiFTy17))
+
+#### Authors: 1
+
+- Kieran Nichols ([@DRiFTy17](https://github.com/DRiFTy17))
+
+---
+
 # v3.0.0 (Mon Jun 10 2024)
 
 :tada: This release contains work from a new contributor! :tada:
