@@ -1,3 +1,24 @@
+# v3.1.0 (Wed Nov 20 2024)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Mike Matuszak ([@MikeMatusz](https://github.com/MikeMatusz)), for all your work!
+
+#### 🚀 Enhancement
+
+- feat(component-utils): cache parsed templates to optimize rendering [#21](https://github.com/tyler-technologies-oss/forge-core/pull/21) ([@MikeMatusz](https://github.com/MikeMatusz))
+
+#### 🐛 Bug Fix
+
+- fix(readoptStyles): only attempt to readopt constructed stylesheets if the element instance has an `ownerDocument.defaultView` value set [#20](https://github.com/tyler-technologies-oss/forge-core/pull/20) ([@DRiFTy17](https://github.com/DRiFTy17))
+
+#### Authors: 2
+
+- Kieran Nichols ([@DRiFTy17](https://github.com/DRiFTy17))
+- Mike Matuszak ([@MikeMatusz](https://github.com/MikeMatusz))
+
+---
+
 # v3.0.1 (Wed Aug 21 2024)
 
 #### 🐛 Bug Fix
