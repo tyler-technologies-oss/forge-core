@@ -218,22 +218,21 @@ export function setShadowStyles<T extends HTMLElement>(componentInstance: T, sty
 }
 
 /**
- * Reapplies styles to the shadow root of the provided element instance. This function was
+ * Re-applies styles to the shadow root of the provided element instance. This function is
  * intended to be called after an element has been adopted by a new document to reconstruct the
- * adopted stylesheet instances within the context of the new document.
+ * adopted stylesheet instances within the context (view) of the new document.
  * 
  * @param componentInstance The component instance to reapply styles to.
  */
 export function readoptStyles<T extends HTMLElement>(componentInstance: T): void {
   if (!supportsConstructableStyleSheets ||
       !componentInstance.shadowRoot ||
-      !componentInstance.constructor[CUSTOM_ELEMENT_CSS_PROPERTY]) {
+      !componentInstance.constructor[CUSTOM_ELEMENT_CSS_PROPERTY] ||
+      !componentInstance.ownerDocument.defaultView) {
     return;
   }
-  const cssText = componentInstance.constructor[CUSTOM_ELEMENT_CSS_PROPERTY];
-  const context = componentInstance.ownerDocument.defaultView ?? window;
-  const sheet = new context.CSSStyleSheet();
-  sheet.replaceSync(cssText);
+  const sheet = new componentInstance.ownerDocument.defaultView.CSSStyleSheet();
+  sheet.replaceSync(componentInstance.constructor[CUSTOM_ELEMENT_CSS_PROPERTY]);
   componentInstance.shadowRoot.adoptedStyleSheets = [sheet];
 }
 
