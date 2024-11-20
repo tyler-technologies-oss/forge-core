@@ -4,6 +4,7 @@ import {
   CUSTOM_ELEMENT_DEPENDENCIES_PROPERTY,
   CUSTOM_ELEMENT_NAME_PROPERTY,
   CUSTOM_ELEMENT_STYLESHEETS_PROPERTY,
+  CUSTOM_ELEMENT_TEMPLATE_PROPERTY,
   supportsConstructableStyleSheets
 } from './constants';
 
@@ -99,32 +100,29 @@ export function attachLightTemplate<T extends HTMLElement>(componentInstance: T,
  * Attaches a shadow root to the given web component instance.
  * @param {T} componentInstance A component instance.
  * @param {string} elementName The name of the element the shadow root is to be attached to.
- * @param {string} template The shadow root template HTML string.
+ * @param {string | HTMLTemplateElement} template The shadow root template HTML string or element.
  * @param {string | string[]} styles The shadow root styles string to be encapsulated by this shadow root.
  * @param {boolean} [delegatesFocus=false] Should the component delegate focus.
  */
-export function attachShadowTemplate<T extends HTMLElement>(componentInstance: T, template: string, styles?: string | string[], delegatesFocus = false): void {
-  const templateElement = prepareShadowTemplate(template);
+export function attachShadowTemplate<T extends HTMLElement>(componentInstance: T, template: string | HTMLTemplateElement, styles?: string | string[], delegatesFocus = false): void {
   componentInstance.attachShadow({ mode: 'open', delegatesFocus });
   if (styles) {
     setShadowStyles(componentInstance, styles);
   }
-  setShadowTemplate(componentInstance, templateElement);
+  setShadowTemplate(componentInstance, template);
 }
 
 /**
  * Replaces the template of an existing shadow root with the provided template.
  * @param {T} componentInstance A component instance.
  * @param {string} elementName The name of the element the shadow root is to be attached to.
- * @param {string} template The shadow root template HTML string.
+ * @param {string | HTMLTemplateElement} template The shadow root template HTML string or element.
  * @param {string | string[]} styles The shadow root styles string to be encapsulated by this shadow root.
  */
-export function replaceShadowTemplate<T extends HTMLElement>(componentInstance: T, template: string, styles?: string | string[]): void {
+export function replaceShadowTemplate<T extends HTMLElement>(componentInstance: T, template: string | HTMLTemplateElement, styles?: string | string[]): void {
   if (!componentInstance.shadowRoot) {
     throw new Error('This element does not contain a shadow root. Did you mean to call `attachShadowTemplate`?');
   }
-
-  const templateElement = prepareShadowTemplate(template);
 
   if ((componentInstance.shadowRoot as ShadowRoot).children.length) {
     removeAllChildren(componentInstance.shadowRoot as any);
@@ -134,7 +132,7 @@ export function replaceShadowTemplate<T extends HTMLElement>(componentInstance: 
     setShadowStyles(componentInstance, styles, { force: true });
   }
 
-  setShadowTemplate(componentInstance, templateElement);
+  setShadowTemplate(componentInstance, template, {force: true});
 }
 
 /**
@@ -166,10 +164,16 @@ export function prepareShadowTemplate(template: string, styles?: string | string
 /**
  * Appends a template to the provided components shadow root.
  * @param {T} componentInstance A component instance.
- * @param {HTMLTemplateElement} templateElement A template element to be cloned.
+ * @param {string | HTMLTemplateElement} template A template string or template element to be cloned.
  */
-export function setShadowTemplate<T extends HTMLElement>(componentInstance: T, templateElement: HTMLTemplateElement): void {
-  (componentInstance.shadowRoot as ShadowRoot).appendChild(templateElement.content.cloneNode(true));
+export function setShadowTemplate<T extends HTMLElement>(componentInstance: T, template: string | HTMLTemplateElement, {force} = {force: false}): void {
+  const ctor = componentInstance.constructor;
+  if (force || !ctor[CUSTOM_ELEMENT_TEMPLATE_PROPERTY]) {
+    const templateElement = template instanceof HTMLTemplateElement ? template : parseTemplateString(template);
+    ctor[CUSTOM_ELEMENT_TEMPLATE_PROPERTY] = templateElement;
+  }
+  const resolvedTemplate = ctor[CUSTOM_ELEMENT_TEMPLATE_PROPERTY] as HTMLTemplateElement;
+  (componentInstance.shadowRoot as ShadowRoot).appendChild(resolvedTemplate.content.cloneNode(true));
 }
 
 /**
