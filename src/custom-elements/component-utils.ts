@@ -33,10 +33,18 @@ export function defineCustomElements(components: any[]): void {
  * @param ctor The custom element constructor.
  */
 export function tryDefine(name: string, ctor: CustomElementConstructor, options?: ElementDefinitionOptions | undefined): void {
-  if (window?.customElements?.get(name)) {
+  if (hasDefinedCustomElement(name)) {
     return;
   }
   window.customElements.define(name, ctor, options);
+}
+
+/**
+ * Checks to see if the custom element is defined in the registry.
+ * @param name The name of the custom element to query the registry with.
+ */
+export function hasDefinedCustomElement(name: string): boolean {
+  return window?.customElements?.get(name) !== undefined;
 }
 
 /**

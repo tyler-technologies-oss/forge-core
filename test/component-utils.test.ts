@@ -1,7 +1,26 @@
 import { expect } from '@esm-bundle/chai';
-import { getClosestShadowRoot } from '../src/custom-elements/component-utils';
+import { defineCustomElement, getClosestShadowRoot, hasDefinedCustomElement } from '../src/custom-elements/component-utils';
+import { CUSTOM_ELEMENT_NAME_PROPERTY } from '../src/custom-elements/constants';
 
 describe('ComponentUtils', () => {
+  describe('hasDefinedCustomElement', () => {
+  
+    class TestCustomElement extends HTMLElement {
+      constructor() {
+        super();
+      }
+    }
+
+    it('should return true if custom element is defined', () => {
+      window.customElements.define('test-component-that-returns-true-when-checked', TestCustomElement);
+      expect(hasDefinedCustomElement('test-component-that-returns-true-when-checked')).to.be.true;
+    });
+
+    it('should return false if custom element is not defined', () => {
+      expect(hasDefinedCustomElement('test-component-that-returns-false-when-checked')).to.be.false;
+    });
+  });
+
   describe('getClosestShadowRoot', () => {
     let lightElement: HTMLElement;
     let shadowHostElement: HTMLElement;
