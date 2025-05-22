@@ -588,12 +588,12 @@ describe('DOMUtils', () => {
     });
 
     it('should not resolve if child that doesn\'t match selectors is added', async () => {
-      await tick();
-      element.appendChild(document.createElement('div'));
       const input = document.createElement('input');
-      setTimeout(() => element.appendChild(input), 1000);
-      const foundInput = await DOMUtils.ensureChild(element, 'input');
-      expect(foundInput).to.equal(input);
+      setTimeout(() => element.appendChild(input), 500);
+      const cb = spy();
+      DOMUtils.ensureChild(element, 'div').then(cb);
+      await timer(1000);
+      expect(cb.called).to.be.false;
     });
 
     it('should not resolve if child is not found', async () => {

@@ -1,7 +1,9 @@
 import { Observer } from './types';
 
 export class Subject<T> {
+  // eslint-disable-next-line @tylertech-eslint/require-private-modifier
   protected source: T;
+  // eslint-disable-next-line @tylertech-eslint/require-private-modifier
   protected subscribers: Subscription<T>[] = [];
   public get value(): T {
     return this.source;

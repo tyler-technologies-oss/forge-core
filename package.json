@@ -24,28 +24,28 @@
     "release": "auto shipit"
   },
   "dependencies": {
-    "tslib": "^2.6.3"
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@auto-it/conventional-commits": "^11.1.6",
-    "@auto-it/first-time-contributor": "^11.1.6",
-    "@auto-it/npm": "^11.1.6",
-    "@commitlint/cli": "^19.3.0",
-    "@commitlint/config-conventional": "^19.2.2",
+    "@auto-it/conventional-commits": "^11.3.0",
+    "@auto-it/first-time-contributor": "^11.3.0",
+    "@auto-it/npm": "^11.3.0",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@esm-bundle/chai": "^4.3.4-fix.0",
-    "@tylertech-eslint/eslint-plugin": "^1.0.12",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^20.14.2",
-    "@types/sinon": "^17.0.3",
-    "@web/dev-server-esbuild": "^1.0.2",
-    "@web/test-runner": "^0.18.2",
-    "auto": "^11.1.6",
-    "commitlint": "^19.3.0",
+    "@tylertech-eslint/eslint-plugin": "^2.1.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.15.21",
+    "@types/sinon": "^17.0.4",
+    "@web/dev-server-esbuild": "^1.0.4",
+    "@web/test-runner": "^0.20.2",
+    "auto": "^11.3.0",
+    "commitlint": "^19.8.1",
     "http-server": "^14.1.1",
-    "husky": "^9.0.11",
-    "rimraf": "^5.0.7",
-    "sinon": "^18.0.0",
-    "typescript": "~5.4.5"
+    "husky": "^9.1.7",
+    "rimraf": "^6.0.1",
+    "sinon": "^20.0.0",
+    "typescript": "~5.8.3"
   },
   "overrides": {
     "@typescript-eslint/typescript-estree": "^7.12.0"
