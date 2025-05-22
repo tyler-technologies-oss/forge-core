@@ -1,3 +1,21 @@
+# v3.2.0 (Thu May 22 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Beau Christian ([@bctt](https://github.com/bctt)), for all your work!
+
+#### 🚀 Enhancement
+
+- Bump dependencies to latest [#23](https://github.com/tyler-technologies-oss/forge-core/pull/23) ([@DRiFTy17](https://github.com/DRiFTy17))
+- feat(component-utils): add dedicated function to check for a registered custom element [#22](https://github.com/tyler-technologies-oss/forge-core/pull/22) ([@bctt](https://github.com/bctt))
+
+#### Authors: 2
+
+- Beau Christian ([@bctt](https://github.com/bctt))
+- Kieran Nichols ([@DRiFTy17](https://github.com/DRiFTy17))
+
+---
+
 # v3.1.0 (Wed Nov 20 2024)
 
 :tada: This release contains work from a new contributor! :tada:
