@@ -38,7 +38,7 @@
     "@types/node": "^22.15.21",
     "@types/sinon": "^17.0.4",
     "@web/dev-server-esbuild": "^1.0.4",
-    "@web/test-runner": "^0.20.1",
+    "@web/test-runner": "^0.20.2",
     "auto": "^11.3.0",
     "commitlint": "^19.8.1",
     "http-server": "^14.1.1",
