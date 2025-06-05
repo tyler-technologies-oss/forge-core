@@ -1,3 +1,20 @@
+# v3.2.1 (Thu Jun 05 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Joe Nunnelley ([@JoeNunnelley](https://github.com/JoeNunnelley)), for all your work!
+
+#### 🐛 Bug Fix
+
+- Security Code Scanning - configuration files [#27](https://github.com/tyler-technologies-oss/forge-core/pull/27) ([@JoeNunnelley](https://github.com/JoeNunnelley))
+- Dependency reviewer [#24](https://github.com/tyler-technologies-oss/forge-core/pull/24) ([@JoeNunnelley](https://github.com/JoeNunnelley))
+
+#### Authors: 1
+
+- Joe Nunnelley ([@JoeNunnelley](https://github.com/JoeNunnelley))
+
+---
+
 # v3.2.0 (Thu May 22 2025)
 
 :tada: This release contains work from a new contributor! :tada:
